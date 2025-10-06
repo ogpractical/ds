@@ -1,0 +1,207 @@
+
+## **Section I: C Programming**
+
+### **Option 1: Recursive Quick Sort**
+
+```c
+#include <stdio.h>
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Partition function
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1;
+
+    for(int j = low; j < high; j++) {
+        if(arr[j] < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i+1], &arr[high]);
+    return i + 1;
+}
+
+// Recursive Quick Sort
+void quickSort(int arr[], int low, int high) {
+    if(low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter %d integers:\n", n);
+    for(int i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    quickSort(arr, 0, n - 1);
+
+    printf("Sorted array in ascending order:\n");
+    for(int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+
+    return 0;
+}
+```
+
+---
+
+### **Option 2: Static Stack Implementation**
+
+```c
+#include <stdio.h>
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+// Push function
+void push(int value) {
+    if(top == MAX - 1) {
+        printf("Stack Overflow!\n");
+        return;
+    }
+    stack[++top] = value;
+}
+
+// Pop function
+int pop() {
+    if(top == -1) {
+        printf("Stack Underflow!\n");
+        return -1;
+    }
+    return stack[top--];
+}
+
+// Display stack
+void display() {
+    if(top == -1) {
+        printf("Stack is empty.\n");
+        return;
+    }
+    printf("Stack elements: ");
+    for(int i = top; i >= 0; i--)
+        printf("%d ", stack[i]);
+    printf("\n");
+}
+
+int main() {
+    int n, value;
+    printf("Enter number of elements to push: ");
+    scanf("%d", &n);
+
+    for(int i = 0; i < n; i++) {
+        printf("Enter element %d: ", i+1);
+        scanf("%d", &value);
+        push(value);
+    }
+
+    display();
+    printf("Popped element: %d\n", pop());
+    display();
+
+    return 0;
+}
+```
+
+---
+
+## **Section II: PostgreSQL**
+
+### **A. Create Tables and Insert Records**
+
+```sql
+-- Owner Table
+CREATE TABLE Owner (
+    oname VARCHAR(50) PRIMARY KEY,
+    address VARCHAR(100),
+    phone VARCHAR(15)
+);
+
+-- Property Table
+CREATE TABLE Property (
+    Pno SERIAL PRIMARY KEY,
+    area_Sqft INT,
+    location VARCHAR(50),
+    city VARCHAR(50),
+    oname VARCHAR(50) REFERENCES Owner(oname)
+);
+
+-- Sample inserts
+INSERT INTO Owner (oname, address, phone) VALUES
+('Mr.Rahane', '123 Street, Pune', '9876543210'),
+('Mr.Baravkar', '456 Road, Pune', '9876541230'),
+('Mr.Shah', '789 Lane, Nashik', '9876512340');
+
+INSERT INTO Property (area_Sqft, location, city, oname) VALUES
+(1500, 'Kothrud', 'Pune', 'Mr.Rahane'),
+(2500, 'Deccan', 'Pune', 'Mr.Baravkar'),
+(12000, 'Kothrud', 'Pune', 'Mr.Rahane'),
+(1800, 'Mhatre', 'Nashik', 'Mr.Shah'),
+(2100, 'Nashik City', 'Nashik', 'Mr.Shah');
+```
+
+---
+
+### **B. Queries (Any 3)**
+
+```sql
+-- i. List all properties in Nashik city
+SELECT * FROM Property WHERE city='Nashik';
+
+-- ii. Names of owners whose property > 2000 sqft
+SELECT DISTINCT oname FROM Property WHERE area_Sqft > 2000;
+
+-- iii. Number of properties owned by Mr.Rahane
+SELECT COUNT(*) FROM Property WHERE oname='Mr.Rahane';
+
+-- iv. Count all properties in Pune city
+SELECT COUNT(*) FROM Property WHERE city='Pune';
+
+-- v. Delete all properties in Pune city owned by Mr.Baravkar
+DELETE FROM Property WHERE city='Pune' AND oname='Mr.Baravkar';
+```
+
+---
+
+### **C. Advanced Query / View**
+
+**Query: Owners who own a property in Pune city, Kothrud area, >10000 sqft**
+
+```sql
+SELECT DISTINCT oname
+FROM Property
+WHERE city='Pune' AND location='Kothrud' AND area_Sqft > 10000;
+```
+
+**OR Create a view: Owner-wise list of properties**
+
+```sql
+CREATE VIEW OwnerProperties AS
+SELECT o.oname, ARRAY_AGG(p.Pno) AS properties
+FROM Owner o
+JOIN Property p ON o.oname = p.oname
+GROUP BY o.oname;
+```
+
+---
+
+✅ This solution includes:
+
+* **C programs** for recursive quick sort and static stack.
+* **PostgreSQL** table creation, insertion, queries, and advanced query/view.
+
+I can also create a **combined menu-driven C program** where the user can choose between Quick Sort and Stack operations for exams. Do you want me to do that?
