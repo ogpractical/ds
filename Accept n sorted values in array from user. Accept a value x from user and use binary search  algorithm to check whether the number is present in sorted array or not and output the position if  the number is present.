@@ -1,0 +1,260 @@
+
+🧮 Section I: Data Structures (15 Marks)
+
+
+---
+
+Q1. Accept n sorted values and use Binary Search
+
+#include <stdio.h>
+
+int binarySearch(int arr[], int n, int x) {
+    int low = 0, high = n - 1, mid;
+    while (low <= high) {
+        mid = (low + high) / 2;
+        if (arr[mid] == x)
+            return mid;   // element found
+        else if (arr[mid] < x)
+            low = mid + 1;
+        else
+            high = mid - 1;
+    }
+    return -1; // not found
+}
+
+int main() {
+    int n, x, i, pos;
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter %d sorted values:\n", n);
+    for (i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    printf("Enter value to search: ");
+    scanf("%d", &x);
+
+    pos = binarySearch(arr, n, x);
+
+    if (pos != -1)
+        printf("%d found at position %d\n", x, pos + 1);
+    else
+        printf("%d not found in the array.\n", x);
+
+    return 0;
+}
+
+
+---
+
+OR: Read data from file and sort by age using Insertion Sort
+
+File: Student.txt
+
+Amit 20 75
+Sneha 18 82
+Rahul 19 68
+Priya 21 91
+
+Program:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Student {
+    char name[50];
+    int age;
+    float percentage;
+};
+
+int main() {
+    struct Student s[100];
+    FILE *fp;
+    int i = 0, j;
+    struct Student key;
+
+    fp = fopen("Student.txt", "r");
+    if (fp == NULL) {
+        printf("File not found!\n");
+        return 1;
+    }
+
+    while (fscanf(fp, "%s %d %f", s[i].name, &s[i].age, &s[i].percentage) != EOF) {
+        i++;
+    }
+    fclose(fp);
+    int n = i;
+
+    // Insertion Sort by Age
+    for (i = 1; i < n; i++) {
+        key = s[i];
+        j = i - 1;
+        while (j >= 0 && s[j].age > key.age) {
+            s[j + 1] = s[j];
+            j--;
+        }
+        s[j + 1] = key;
+    }
+
+    printf("\nSorted List (by Age):\n");
+    for (i = 0; i < n; i++)
+        printf("%s\t%d\t%.2f\n", s[i].name, s[i].age, s[i].percentage);
+
+    // Writing to new file
+    fp = fopen("Sorted.txt", "w");
+    for (i = 0; i < n; i++)
+        fprintf(fp, "%s %d %.2f\n", s[i].name, s[i].age, s[i].percentage);
+    fclose(fp);
+
+    printf("\nData written to 'Sorted.txt'\n");
+
+    return 0;
+}
+
+
+---
+
+🗄️ Section II: Database Management Systems (15 Marks)
+
+
+---
+
+Given:
+
+Item (itemno, name, quantity)
+Supplier (sno, name, city)
+Relationship: Item–Supplier → many-to-many with rate as descriptive attribute
+
+
+---
+
+A. Create database and insert data
+
+CREATE TABLE Item (
+    itemno INT PRIMARY KEY,
+    name VARCHAR(50),
+    quantity INT
+);
+
+CREATE TABLE Supplier (
+    sno INT PRIMARY KEY,
+    name VARCHAR(50),
+    city VARCHAR(50)
+);
+
+CREATE TABLE Item_Supplier (
+    itemno INT REFERENCES Item(itemno),
+    sno INT REFERENCES Supplier(sno),
+    rate DECIMAL(10,2),
+    PRIMARY KEY (itemno, sno)
+);
+
+-- Insert sample data
+INSERT INTO Item VALUES 
+(1, 'Mouse', 25),
+(2, 'Keyboard', 8),
+(3, 'Monitor', 5),
+(4, 'Printer', 12);
+
+INSERT INTO Supplier VALUES 
+(101, 'Mohan', 'Pune'),
+(102, 'Suresh', 'Mumbai'),
+(103, 'Meena', 'Nashik'),
+(104, 'Mahesh', 'Pune');
+
+INSERT INTO Item_Supplier VALUES
+(1, 101, 450),
+(2, 102, 700),
+(3, 103, 5200),
+(4, 104, 3000),
+(2, 103, 650);
+
+
+---
+
+B. Execute the following queries (any 3)
+
+i. Change the quantity of item ‘Mouse’ to 80.
+
+UPDATE Item SET quantity = 80 WHERE name = 'Mouse';
+
+ii. List details of suppliers whose name begins with alphabet ‘M’.
+
+SELECT * FROM Supplier WHERE name LIKE 'M%';
+
+iii. Display total count of items.
+
+SELECT COUNT(*) AS Total_Items FROM Item;
+
+iv. List names of suppliers who do not live in Pune city.
+
+SELECT name FROM Supplier WHERE city <> 'Pune';
+
+v. List names of items with quantity less than 10.
+
+SELECT name FROM Item WHERE quantity < 10;
+
+
+---
+
+C. Write a query to display name of supplier who supplies item with minimum rate
+
+SELECT s.name, i.name AS item_name, isup.rate
+FROM Supplier s
+JOIN Item_Supplier isup ON s.sno = isup.sno
+JOIN Item i ON isup.itemno = i.itemno
+WHERE isup.rate = (SELECT MIN(rate) FROM Item_Supplier);
+
+
+---
+
+OR: Create a view to display supplier-wise list of items
+
+CREATE VIEW SupplierWiseItems AS
+SELECT s.name AS supplier_name, i.name AS item_name, isup.rate
+FROM Supplier s
+JOIN Item_Supplier isup ON s.sno = isup.sno
+JOIN Item i ON isup.itemno = i.itemno;
+
+
+---
+
+🎤 Q3. Viva (5 Marks)
+
+Sample Viva Questions:
+
+1. What is the difference between linear and binary search?
+
+
+2. What is insertion sort?
+
+
+3. Define primary key and foreign key.
+
+
+4. What is a view in SQL?
+
+
+5. Explain many-to-many relationship with example.
+
+
+
+
+---
+
+✅ Marks Distribution:
+
+Data Structures: 15
+
+DBMS: 15
+
+Viva: 5
+Total: 35 Marks
+
+
+
+---
+
+Would you like me to make a PDF “Solved Practical File” for this (formatted for printing/submission)?
