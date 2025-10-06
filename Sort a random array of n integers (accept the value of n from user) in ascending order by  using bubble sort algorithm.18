@@ -1,0 +1,219 @@
+
+
+## **Section I: C Programming**
+
+### **Option 1: Bubble Sort**
+
+```c
+#include <stdio.h>
+
+int main() {
+    int n, i, j, temp;
+
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter %d integers:\n", n);
+    for(i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    // Bubble Sort
+    for(i = 0; i < n-1; i++) {
+        for(j = 0; j < n-i-1; j++) {
+            if(arr[j] > arr[j+1]) {
+                // Swap
+                temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+
+    printf("Array sorted in ascending order:\n");
+    for(i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+
+    return 0;
+}
+```
+
+---
+
+### **Option 2: Dynamic Stack Implementation**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int *data;
+    int top;
+    int capacity;
+} Stack;
+
+// Create a dynamic stack
+Stack* createStack(int capacity) {
+    Stack* stack = (Stack*)malloc(sizeof(Stack));
+    stack->capacity = capacity;
+    stack->top = -1;
+    stack->data = (int*)malloc(capacity * sizeof(int));
+    return stack;
+}
+
+// Push element
+void push(Stack* stack, int value) {
+    if(stack->top == stack->capacity - 1) {
+        printf("Stack Overflow!\n");
+        return;
+    }
+    stack->data[++stack->top] = value;
+}
+
+// Pop element
+int pop(Stack* stack) {
+    if(stack->top == -1) {
+        printf("Stack Underflow!\n");
+        return -1;
+    }
+    return stack->data[stack->top--];
+}
+
+// Display stack
+void display(Stack* stack) {
+    if(stack->top == -1) {
+        printf("Stack is empty.\n");
+        return;
+    }
+    printf("Stack elements: ");
+    for(int i = stack->top; i >= 0; i--)
+        printf("%d ", stack->data[i]);
+    printf("\n");
+}
+
+int main() {
+    int n, value;
+    printf("Enter stack capacity: ");
+    scanf("%d", &n);
+
+    Stack* stack = createStack(n);
+
+    for(int i = 0; i < n; i++) {
+        printf("Enter element to push: ");
+        scanf("%d", &value);
+        push(stack, value);
+    }
+
+    display(stack);
+
+    printf("Popped element: %d\n", pop(stack));
+    display(stack);
+
+    free(stack->data);
+    free(stack);
+    return 0;
+}
+```
+
+---
+
+## **Section II: PostgreSQL**
+
+### **A. Create Tables and Insert Records**
+
+```sql
+-- Student table
+CREATE TABLE Student (
+    rno SERIAL PRIMARY KEY,
+    name VARCHAR(50),
+    city VARCHAR(50)
+);
+
+-- Teacher table
+CREATE TABLE Teacher (
+    tno SERIAL PRIMARY KEY,
+    tname VARCHAR(50),
+    phone_no VARCHAR(15),
+    salary NUMERIC(10,2)
+);
+
+-- Student-Teacher relationship (Many-to-Many with subject)
+CREATE TABLE Student_Teacher (
+    rno INT REFERENCES Student(rno),
+    tno INT REFERENCES Teacher(tno),
+    subject VARCHAR(50),
+    PRIMARY KEY(rno, tno, subject)
+);
+
+-- Sample data
+INSERT INTO Student (name, city) VALUES
+('Amit', 'Sangamner'),
+('Sita', 'Pune'),
+('Rohit', 'Sangamner');
+
+INSERT INTO Teacher (tname, phone_no, salary) VALUES
+('Dr.Wani', '9876543210', 50000),
+('Dr.Mulay', '9876500000', 45000),
+('Dr.Shah', '9876512345', 60000);
+
+INSERT INTO Student_Teacher (rno, tno, subject) VALUES
+(1, 1, 'IKS'),
+(2, 1, 'Electronics'),
+(3, 2, 'IKS'),
+(1, 3, 'Mathematics');
+```
+
+---
+
+### **B. Queries (Any 3)**
+
+```sql
+-- i. List students from "Sangamner" city
+SELECT name FROM Student WHERE city='Sangamner';
+
+-- ii. Maximum salary of teachers
+SELECT MAX(salary) AS max_salary FROM Teacher;
+
+-- iii. Change phone number of teacher 'Dr.Mulay'
+UPDATE Teacher SET phone_no='9834233235' WHERE tname='Dr.Mulay';
+
+-- iv. List details of teachers sorted by name
+SELECT * FROM Teacher ORDER BY tname;
+
+-- v. Count number of students who have taken subject "IKS"
+SELECT COUNT(DISTINCT rno) FROM Student_Teacher WHERE subject='IKS';
+```
+
+---
+
+### **C. Advanced Query / View**
+
+**Query: Students taught by teacher “Dr.Wani”**
+
+```sql
+SELECT s.name
+FROM Student s
+JOIN Student_Teacher st ON s.rno = st.rno
+JOIN Teacher t ON st.tno = t.tno
+WHERE t.tname='Dr.Wani';
+```
+
+**OR Create a view: Students who have not taken ‘Electronics’ subject**
+
+```sql
+CREATE VIEW Students_Not_Electronics AS
+SELECT * FROM Student
+WHERE rno NOT IN (
+    SELECT rno FROM Student_Teacher WHERE subject='Electronics'
+);
+```
+
+---
+
+✅ This solution includes:
+
+* **C programs** for Bubble Sort and Dynamic Stack.
+* **PostgreSQL** tables, inserts, queries, and advanced query/view.
+
+I can also make a **combined menu-driven C program** where the user can choose Bubble Sort or Dynamic Stack. Do you want me to do that?
