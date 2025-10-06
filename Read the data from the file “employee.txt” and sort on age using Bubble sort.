@@ -1,0 +1,254 @@
+
+## **Section I: C Programming**
+
+### **Option 1: Read Employee Data from File and Sort by Age (Bubble Sort)**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char name[50];
+    int age;
+    float salary;
+} Employee;
+
+int main() {
+    FILE *fptr;
+    Employee emp[100];
+    int count = 0, i, j;
+    Employee temp;
+
+    fptr = fopen("employee.txt", "r");
+    if (!fptr) {
+        printf("Error opening file!\n");
+        return 1;
+    }
+
+    // Read data from file
+    while (fscanf(fptr, "%s %d %f", emp[count].name, &emp[count].age, &emp[count].salary) != EOF) {
+        count++;
+    }
+    fclose(fptr);
+
+    // Bubble sort based on age
+    for(i = 0; i < count-1; i++) {
+        for(j = 0; j < count-i-1; j++) {
+            if(emp[j].age > emp[j+1].age) {
+                temp = emp[j];
+                emp[j] = emp[j+1];
+                emp[j+1] = temp;
+            }
+        }
+    }
+
+    // Display sorted employees
+    printf("Employees sorted by age:\n");
+    for(i = 0; i < count; i++) {
+        printf("%s %d %.2f\n", emp[i].name, emp[i].age, emp[i].salary);
+    }
+
+    return 0;
+}
+```
+
+---
+
+### **Option 2: Menu-Driven Singly Linked List**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Node {
+    char data[50];
+    struct Node* next;
+} Node;
+
+Node* head = NULL;
+
+// Create list
+void createList(int n) {
+    Node *temp, *p;
+    char str[50];
+    for(int i = 0; i < n; i++) {
+        printf("Enter element %d: ", i+1);
+        scanf("%s", str);
+        temp = (Node*)malloc(sizeof(Node));
+        strcpy(temp->data, str);
+        temp->next = NULL;
+
+        if(head == NULL) head = temp;
+        else {
+            p = head;
+            while(p->next) p = p->next;
+            p->next = temp;
+        }
+    }
+}
+
+// Delete node by value
+void deleteNode(char str[]) {
+    Node *temp = head, *prev = NULL;
+
+    while(temp != NULL && strcmp(temp->data, str) != 0) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if(temp == NULL) {
+        printf("Element not found.\n");
+        return;
+    }
+
+    if(prev == NULL) head = temp->next;
+    else prev->next = temp->next;
+
+    free(temp);
+    printf("Element deleted successfully.\n");
+}
+
+// Display list
+void displayList() {
+    Node* p = head;
+    if(!p) {
+        printf("List is empty.\n");
+        return;
+    }
+    while(p) {
+        printf("%s -> ", p->data);
+        p = p->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    int choice, n;
+    char str[50];
+
+    do {
+        printf("\nMenu:\n1. Create\n2. Delete\n3. Display\n4. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch(choice) {
+            case 1:
+                printf("Enter number of elements: ");
+                scanf("%d", &n);
+                createList(n);
+                break;
+            case 2:
+                printf("Enter element to delete: ");
+                scanf("%s", str);
+                deleteNode(str);
+                break;
+            case 3:
+                displayList();
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice.\n");
+        }
+    } while(choice != 4);
+
+    return 0;
+}
+```
+
+---
+
+## **Section II: PostgreSQL**
+
+### **A. Create Tables and Insert Records**
+
+```sql
+-- Client table
+CREATE TABLE Client (
+    cno SERIAL PRIMARY KEY,
+    name VARCHAR(50),
+    address VARCHAR(100)
+);
+
+-- Order table
+CREATE TABLE "Order" (
+    orderno SERIAL PRIMARY KEY,
+    s_order_date DATE,
+    amount NUMERIC(10,2) CHECK (amount > 0),
+    cno INT REFERENCES Client(cno)
+);
+
+-- Sample data
+INSERT INTO Client (name, address) VALUES
+('Mr.Kulkarni', 'Mumbai'),
+('Mr.Patil', 'Pune'),
+('Mr.Rahane', 'Sangamner'),
+('Mr.Shah', 'Mumbai');
+
+INSERT INTO "Order" (s_order_date, amount, cno) VALUES
+('2019-04-12', 50000, 1),
+('2019-10-05', 30000, 2),
+('2019-10-15', 40000, 3),
+('2019-07-20', 60000, 4),
+('2019-10-25', 45000, 1);
+```
+
+---
+
+### **B. Queries (Any 3)**
+
+```sql
+-- i. Change order date of client number '04' to '2019-04-12'
+UPDATE "Order" SET s_order_date='2019-04-12'
+WHERE cno=4;
+
+-- ii. Display all orders in October
+SELECT * FROM "Order"
+WHERE EXTRACT(MONTH FROM s_order_date) = 10;
+
+-- iii. Display all orders in descending order of amount
+SELECT * FROM "Order" ORDER BY amount DESC;
+
+-- iv. Delete all clients of Mumbai
+DELETE FROM Client WHERE address='Mumbai';
+
+-- v. Count number of orders having amount greater than 40000
+SELECT COUNT(*) FROM "Order" WHERE amount > 40000;
+```
+
+---
+
+### **C. Advanced Query / View**
+
+**Query: Client name who has placed maximum number of orders**
+
+```sql
+SELECT c.name
+FROM Client c
+JOIN "Order" o ON c.cno = o.cno
+GROUP BY c.name
+ORDER BY COUNT(o.orderno) DESC
+LIMIT 1;
+```
+
+**OR Create a view: Clients having more than two sales orders**
+
+```sql
+CREATE VIEW Clients_MoreThanTwoOrders AS
+SELECT c.name, COUNT(o.orderno) AS total_orders
+FROM Client c
+JOIN "Order" o ON c.cno = o.cno
+GROUP BY c.name
+HAVING COUNT(o.orderno) > 2;
+```
+
+---
+
+✅ This solution includes:
+
+* **C programs** for Bubble Sort on file data and menu-driven singly linked list.
+* **PostgreSQL** tables, inserts, queries, and advanced query/view.
+
+I can also create a **combined menu-driven C program** where the user can choose between sorting employees or linked list operations for exams. Do you want me to do that?
