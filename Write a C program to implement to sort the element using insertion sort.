@@ -1,0 +1,341 @@
+
+Section I — Data Structures
+
+Q1 (a) — C program: Insertion Sort
+
+/* insertion_sort.c
+   Compile: gcc insertion_sort.c -o insertion_sort
+   Run: ./insertion_sort
+*/
+#include <stdio.h>
+
+void insertionSort(int arr[], int n) {
+    for (int i = 1; i < n; i++) {
+        int key = arr[i];
+        int j = i - 1;
+        // Move elements of arr[0..i-1] that are greater than key
+        // to one position ahead of their current position
+        while (j >= 0 && arr[j] > key) {
+            arr[j+1] = arr[j];
+            j--;
+        }
+        arr[j+1] = key;
+    }
+}
+
+void printArray(int arr[], int n) {
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+}
+
+int main() {
+    int n;
+    printf("Enter number of elements: ");
+    if (scanf("%d", &n) != 1 || n <= 0) return 0;
+    int arr[n];
+    printf("Enter %d integers:\n", n);
+    for (int i = 0; i < n; i++) scanf("%d", &arr[i]);
+
+    printf("Before sorting: ");
+    printArray(arr, n);
+
+    insertionSort(arr, n);
+
+    printf("After insertion sort: ");
+    printArray(arr, n);
+    return 0;
+}
+
+
+---
+
+Q1 (b) — C program: Menu-driven singly linked list
+
+Features: create linked list of n nodes, display list, and search for an element.
+
+/* linked_list_menu.c
+   Compile: gcc linked_list_menu.c -o linked_list_menu
+   Run: ./linked_list_menu
+*/
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+struct Node* createNode(int value) {
+    struct Node* newnode = (struct Node*)malloc(sizeof(struct Node));
+    if (!newnode) {
+        printf("Memory allocation failed\n");
+        exit(1);
+    }
+    newnode->data = value;
+    newnode->next = NULL;
+    return newnode;
+}
+
+void appendNode(struct Node **head, int value) {
+    struct Node *newnode = createNode(value);
+    if (*head == NULL) {
+        *head = newnode;
+        return;
+    }
+    struct Node *temp = *head;
+    while (temp->next) temp = temp->next;
+    temp->next = newnode;
+}
+
+void createList(struct Node **head) {
+    int n, val;
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+    if (n <= 0) {
+        printf("Nothing to create.\n");
+        return;
+    }
+    for (int i = 0; i < n; i++) {
+        printf("Enter value for node %d: ", i+1);
+        scanf("%d", &val);
+        appendNode(head, val);
+    }
+    printf("List created with %d nodes.\n", n);
+}
+
+void displayList(struct Node *head) {
+    if (!head) {
+        printf("List is empty.\n");
+        return;
+    }
+    printf("Linked list elements: ");
+    struct Node *temp = head;
+    while (temp) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+void searchElement(struct Node *head, int key) {
+    int pos = 1;
+    struct Node *temp = head;
+    while (temp) {
+        if (temp->data == key) {
+            printf("Element %d found at position %d.\n", key, pos);
+            return;
+        }
+        temp = temp->next;
+        pos++;
+    }
+    printf("Element %d not found in the list.\n", key);
+}
+
+void freeList(struct Node **head) {
+    struct Node *curr = *head, *next;
+    while (curr) {
+        next = curr->next;
+        free(curr);
+        curr = next;
+    }
+    *head = NULL;
+}
+
+int main() {
+    struct Node *head = NULL;
+    int choice, key;
+    while (1) {
+        printf("\n--- Menu ---\n");
+        printf("1. Create and append nodes\n");
+        printf("2. Display linked list\n");
+        printf("3. Search an element\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        if (scanf("%d", &choice) != 1) break;
+        switch (choice) {
+            case 1:
+                createList(&head);
+                break;
+            case 2:
+                displayList(head);
+                break;
+            case 3:
+                printf("Enter element to search: ");
+                scanf("%d", &key);
+                searchElement(head, key);
+                break;
+            case 4:
+                freeList(&head);
+                printf("Exiting...\n");
+                return 0;
+            default:
+                printf("Invalid choice. Try again.\n");
+        }
+    }
+    return 0;
+}
+
+
+---
+
+Section II — Database Management Systems
+
+Schema given:
+
+Employee(eno, ename, designation, salary) — eno is primary key.
+
+Department(dno, dname, location) — dno is primary key.
+
+Relationship Employee → Department is many-to-one (each employee belongs to a department).
+
+
+Below are PostgreSQL statements to create the schema and insert sample data, then the required queries.
+
+> Use psql or a PostgreSQL client. Assume a database companydb exists and you're connected.
+
+
+
+A. Create tables and insert sample records
+
+-- Create tables
+CREATE TABLE department (
+    dno    SERIAL PRIMARY KEY,
+    dname  VARCHAR(50) NOT NULL,
+    location VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE employee (
+    eno         SERIAL PRIMARY KEY,
+    ename       VARCHAR(100) NOT NULL,
+    designation VARCHAR(50),
+    salary      NUMERIC(12,2),
+    dno         INTEGER REFERENCES department(dno)  -- foreign key
+);
+
+-- Insert sample departments
+INSERT INTO department (dname, location) VALUES
+('HR', 'Pune'),
+('Finance', 'Mumbai'),
+('IT', 'Nashik'),
+('Sales', 'Delhi'),
+('Operations', 'Nashik');
+
+-- Insert sample employees (dno refers to department.dno)
+INSERT INTO employee (ename, designation, salary, dno) VALUES
+('Anita', 'Manager', 60000.00, 1),   -- HR
+('Rahul', 'Accountant', 35000.00, 2),-- Finance
+('Priya', 'Developer', 45000.00, 3), -- IT (Nashik)
+('Suresh', 'Sales Executive', 30000.00, 4), -- Sales (Delhi)
+('Sneha', 'Engineer', 47000.00, 5),  -- Operations (Nashik)
+('Asha', 'HR Executive', 28000.00, 1); -- HR
+
+(You can add more sample rows as needed.)
+
+
+---
+
+B. Execute the following queries (choose any 3). I’ll show 5% raise, average salary, and employees whose names end with 'a' plus extra ones as examples.
+
+(i) Give a 5% raise in salary to all the employees.
+
+UPDATE employee
+SET salary = ROUND(salary * 1.05, 2);
+-- To check:
+SELECT eno, ename, designation, salary FROM employee;
+
+(ii) Display average salary of an employee.
+
+I interpret as "average salary of employees" (overall average):
+
+SELECT ROUND(AVG(salary)::numeric, 2) AS average_salary
+FROM employee;
+
+(iii) List the details of all the departments located at 'Nashik' city.
+
+SELECT * FROM department
+WHERE location = 'Nashik';
+
+(iv) Display the details of employees whose names end with an alphabet 'a'.
+
+SELECT * FROM employee
+WHERE ename ILIKE '%a';  -- ILIKE for case-insensitive
+
+(v) Display the location of 'HR' department.
+
+SELECT location FROM department
+WHERE dname = 'HR';
+
+
+---
+
+C. Query: list details of employees who do not work in any of the departments located at 'Delhi'.
+
+This returns employees whose department is not one of the departments located at Delhi.
+
+SELECT e.*
+FROM employee e
+WHERE e.dno NOT IN (
+    SELECT dno FROM department WHERE location = 'Delhi'
+);
+
+Notes:
+
+If there are employees with dno IS NULL (not assigned), and you want to include them as "not working in Delhi", then use:
+
+
+SELECT *
+FROM employee
+WHERE (dno NOT IN (SELECT dno FROM department WHERE location='Delhi') OR dno IS NULL);
+
+
+---
+
+OR — C. Create a view to list the names of employees whose salary is greater than all the employees working in 'HR' department.
+
+This view lists employee names whose salary > every salary of employees in HR.
+
+CREATE VIEW employees_higher_than_all_hr AS
+SELECT e.ename, e.salary
+FROM employee e
+WHERE e.salary > ALL (
+    SELECT salary
+    FROM employee e2
+    JOIN department d ON e2.dno = d.dno
+    WHERE d.dname = 'HR'
+);
+
+-- To see the view:
+SELECT * FROM employees_higher_than_all_hr;
+
+
+---
+
+Q3 — Viva (5 marks)
+
+Viva is an oral exam — prepare to explain:
+
+Time complexity of insertion sort (best: O(n), average/worst: O(n²))
+
+Linked list operations cost (insert at end O(n) if no tail pointer, O(1) if tail; search O(n))
+
+SQL queries shown & join vs subquery differences
+
+Foreign key constraints and referential integrity
+
+
+
+---
+
+If you want, I can:
+
+Provide additional sample INSERT rows,
+
+Provide SELECT outputs from the sample data,
+
+Convert the SQL to a single SQL script file you can run,
+
+Or give a shorter answer focusing on just one of the OR choices.
+
+
+Which extra would help you most?
