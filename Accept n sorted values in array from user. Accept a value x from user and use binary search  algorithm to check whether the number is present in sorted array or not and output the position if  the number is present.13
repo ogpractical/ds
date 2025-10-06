@@ -1,0 +1,288 @@
+
+# **Section I: C Programming (15 Marks)**
+
+---
+
+## **Option 1: Binary Search on Sorted Array**
+
+### 🧩 **Problem Statement:**
+
+Accept `n` sorted values in an array from the user. Then accept a value `x` and use **binary search** to check whether the number is present. If found, display its position.
+
+### ✅ **C Program:**
+
+```c
+#include <stdio.h>
+
+int main() {
+    int n, i, x, first, last, mid;
+    int arr[100];
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter %d sorted elements:\n", n);
+    for (i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    printf("Enter value to search: ");
+    scanf("%d", &x);
+
+    first = 0;
+    last = n - 1;
+    int found = 0;
+
+    while (first <= last) {
+        mid = (first + last) / 2;
+        if (arr[mid] == x) {
+            printf("Element %d found at position %d.\n", x, mid + 1);
+            found = 1;
+            break;
+        } else if (arr[mid] < x)
+            first = mid + 1;
+        else
+            last = mid - 1;
+    }
+
+    if (!found)
+        printf("Element %d not found in the array.\n", x);
+
+    return 0;
+}
+```
+
+---
+
+## **OR Option 2: Menu Driven Program for Doubly Linked List**
+
+### ✅ **C Program:**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *prev, *next;
+};
+
+struct Node *head = NULL;
+
+void create(int n);
+void insert(int pos, int data);
+void display();
+
+int main() {
+    int choice, n, pos, data;
+
+    while (1) {
+        printf("\n--- DOUBLY LINKED LIST MENU ---\n");
+        printf("1. Create\n2. Insert\n3. Display\n4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter number of nodes: ");
+                scanf("%d", &n);
+                create(n);
+                break;
+
+            case 2:
+                printf("Enter position to insert: ");
+                scanf("%d", &pos);
+                printf("Enter data: ");
+                scanf("%d", &data);
+                insert(pos, data);
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4:
+                exit(0);
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+}
+
+void create(int n) {
+    struct Node *newNode, *temp;
+    int data, i;
+
+    head = NULL;
+
+    for (i = 0; i < n; i++) {
+        newNode = (struct Node*)malloc(sizeof(struct Node));
+        printf("Enter data for node %d: ", i + 1);
+        scanf("%d", &data);
+        newNode->data = data;
+        newNode->next = NULL;
+        newNode->prev = NULL;
+
+        if (head == NULL)
+            head = newNode;
+        else {
+            temp = head;
+            while (temp->next != NULL)
+                temp = temp->next;
+            temp->next = newNode;
+            newNode->prev = temp;
+        }
+    }
+}
+
+void insert(int pos, int data) {
+    struct Node *newNode, *temp;
+    int i;
+
+    newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+
+    if (pos == 1) {
+        newNode->next = head;
+        newNode->prev = NULL;
+        if (head != NULL)
+            head->prev = newNode;
+        head = newNode;
+        return;
+    }
+
+    temp = head;
+    for (i = 1; i < pos - 1 && temp != NULL; i++)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Position not found.\n");
+        free(newNode);
+        return;
+    }
+
+    newNode->next = temp->next;
+    newNode->prev = temp;
+
+    if (temp->next != NULL)
+        temp->next->prev = newNode;
+
+    temp->next = newNode;
+}
+
+void display() {
+    struct Node *temp = head;
+    if (head == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+    printf("Doubly Linked List: ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+```
+
+---
+
+# **Section II: Database Management Systems (15 Marks)**
+
+---
+
+## **A. Table Creation in PostgreSQL**
+
+```sql
+CREATE TABLE Bus (
+    busno INT PRIMARY KEY,
+    capacity INT NOT NULL,
+    depot_name VARCHAR(50)
+);
+
+CREATE TABLE Route (
+    routeno INT PRIMARY KEY,
+    source VARCHAR(50),
+    destination VARCHAR(50),
+    no_of_stations INT
+);
+
+-- Many-to-One Relationship: Many buses -> One route
+ALTER TABLE Bus ADD COLUMN routeno INT REFERENCES Route(routeno);
+```
+
+### Insert Sample Data:
+
+```sql
+INSERT INTO Route VALUES
+(41, 'Pimpri', 'Hadapsar', 12),
+(42, 'Pune Station', 'Swargate', 5),
+(43, 'Katraj', 'Nigdi', 2);
+
+INSERT INTO Bus VALUES
+(201, 50, 'Swargate', 42),
+(202, 40, 'Swargate', 41),
+(203, 60, 'Depot1', 41),
+(204, 55, 'Nigdi', 43);
+```
+
+---
+
+## **B. Execute Any 3 Queries**
+
+i. **List all buses at depot “Swargate”**
+
+```sql
+SELECT * FROM Bus WHERE depot_name = 'Swargate';
+```
+
+ii. **Delete Bus whose Bus number is “204”**
+
+```sql
+DELETE FROM Bus WHERE busno = 204;
+```
+
+iii. **List all buses on route number 41**
+
+```sql
+SELECT * FROM Bus WHERE routeno = 41;
+```
+
+iv. **List the route details having number of stations greater than 10**
+
+```sql
+SELECT * FROM Route WHERE no_of_stations > 10;
+```
+
+v. **List all routes starting from “Pune station”**
+
+```sql
+SELECT * FROM Route WHERE source = 'Pune Station';
+```
+
+---
+
+## **C.**
+
+### **Option 1: Delete all buses on routes having total stations < 3**
+
+```sql
+DELETE FROM Bus
+WHERE routeno IN (
+    SELECT routeno FROM Route WHERE no_of_stations < 3
+);
+```
+
+### **OR Option 2: Create a View for buses and routes from “Pimpri” to “Hadapsar”**
+
+```sql
+CREATE VIEW PimpriToHadapsar AS
+SELECT b.busno, b.capacity, b.depot_name, r.routeno, r.source, r.destination
+FROM Bus b
+JOIN Route r ON b.routeno = r.routeno
+WHERE r.source = 'Pimpri' AND r.destination = 'Hadapsar';
+```
+
+---
+
+Would you like me to **format this answer into a PDF (exam-ready version)** with headings, code boxes, and SQL outputs simulated?
