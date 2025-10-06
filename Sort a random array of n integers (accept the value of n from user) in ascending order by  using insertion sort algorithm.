@@ -1,0 +1,199 @@
+
+## **Section I: C Programming**
+
+### **Option 1: Insertion Sort for n integers**
+
+```c
+#include <stdio.h>
+
+int main() {
+    int n, i, j, key;
+
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter %d integers:\n", n);
+    for (i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    // Insertion Sort
+    for (i = 1; i < n; i++) {
+        key = arr[i];
+        j = i - 1;
+
+        while (j >= 0 && arr[j] > key) {
+            arr[j + 1] = arr[j];
+            j--;
+        }
+        arr[j + 1] = key;
+    }
+
+    printf("Array sorted in ascending order:\n");
+    for (i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+
+    return 0;
+}
+```
+
+---
+
+### **Option 2: Dynamic Stack Implementation**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int *data;
+    int top;
+    int capacity;
+} Stack;
+
+// Function to create stack
+Stack* createStack(int capacity) {
+    Stack* stack = (Stack*)malloc(sizeof(Stack));
+    stack->capacity = capacity;
+    stack->top = -1;
+    stack->data = (int*)malloc(capacity * sizeof(int));
+    return stack;
+}
+
+// Push element
+void push(Stack* stack, int value) {
+    if (stack->top == stack->capacity - 1) {
+        printf("Stack overflow!\n");
+        return;
+    }
+    stack->data[++stack->top] = value;
+}
+
+// Pop element
+int pop(Stack* stack) {
+    if (stack->top == -1) {
+        printf("Stack underflow!\n");
+        return -1;
+    }
+    return stack->data[stack->top--];
+}
+
+// Display stack
+void display(Stack* stack) {
+    if (stack->top == -1) {
+        printf("Stack is empty.\n");
+        return;
+    }
+    printf("Stack elements: ");
+    for (int i = stack->top; i >= 0; i--)
+        printf("%d ", stack->data[i]);
+    printf("\n");
+}
+
+int main() {
+    int n, value;
+    printf("Enter stack capacity: ");
+    scanf("%d", &n);
+
+    Stack* stack = createStack(n);
+
+    // Push elements
+    for (int i = 0; i < n; i++) {
+        printf("Enter element to push: ");
+        scanf("%d", &value);
+        push(stack, value);
+    }
+
+    display(stack);
+
+    // Pop element
+    printf("Popped element: %d\n", pop(stack));
+    display(stack);
+
+    free(stack->data);
+    free(stack);
+    return 0;
+}
+```
+
+---
+
+## **Section II: PostgreSQL**
+
+### **A. Create Tables and Insert Records**
+
+```sql
+CREATE TABLE Game (
+    gname VARCHAR(50) PRIMARY KEY,
+    noofplayers INT,
+    coachname VARCHAR(50),
+    captain_name VARCHAR(50) CHECK (captain_name = UPPER(captain_name))
+);
+
+CREATE TABLE Player (
+    pno SERIAL PRIMARY KEY,
+    pname VARCHAR(50),
+    gname VARCHAR(50) REFERENCES Game(gname)
+);
+
+-- Insert sample data
+INSERT INTO Game (gname, noofplayers, coachname, captain_name) VALUES
+('Cricket', 11, 'Dhoni', 'VIRAT'),
+('Hockey', 16, 'Singh', 'RAMESH'),
+('Kho Kho', 12, 'Patil', 'RAJESH');
+
+INSERT INTO Player (pname, gname) VALUES
+('Amit', 'Cricket'),
+('Rohit', 'Cricket'),
+('Sita', 'Hockey'),
+('Mohan', 'Hockey'),
+('Kiran', 'Kho Kho');
+```
+
+---
+
+### **B. Queries (Any 3)**
+
+```sql
+-- i. List names of players playing “hockey”
+SELECT pname FROM Player WHERE gname='Hockey';
+
+-- ii. Average number of players
+SELECT AVG(noofplayers) AS avg_players FROM Game;
+
+-- iii. Delete records of players playing ‘kho kho’
+DELETE FROM Player WHERE gname='Kho Kho';
+
+-- iv. List names of players not playing “cricket”
+SELECT pname FROM Player WHERE gname <> 'Cricket';
+
+-- v. Update coach name from “Dhoni” to “Tendulkar” for game “Cricket”
+UPDATE Game SET coachname='Tendulkar' WHERE gname='Cricket';
+```
+
+---
+
+### **C. Advanced Query / View**
+
+**Query: Game details with maximum number of players**
+
+```sql
+SELECT * FROM Game
+WHERE noofplayers = (SELECT MAX(noofplayers) FROM Game);
+```
+
+**OR Create a view: Game-wise list of players**
+
+```sql
+CREATE VIEW GamePlayers AS
+SELECT g.gname, p.pname
+FROM Game g
+JOIN Player p ON g.gname = p.gname;
+```
+
+---
+
+✅ This solution covers **C programs** for insertion sort and dynamic stack, and **PostgreSQL** table creation, insertion, queries, and advanced queries/views.
+
+If you want, I can also **merge insertion sort with dynamic memory allocation for extra marks**, which is usually preferred in exams. Do you want me to do that?
