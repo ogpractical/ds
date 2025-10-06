@@ -1,0 +1,255 @@
+
+## **Section I: C Programming**
+
+### **Option 1: Merge Sort on Employee Age (Read/Write Files)**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    char name[50];
+    int age;
+    float salary;
+} Employee;
+
+// Merge function
+void merge(Employee arr[], int l, int m, int r) {
+    int n1 = m - l + 1;
+    int n2 = r - m;
+
+    Employee L[n1], R[n2];
+
+    for(int i = 0; i < n1; i++) L[i] = arr[l + i];
+    for(int j = 0; j < n2; j++) R[j] = arr[m + 1 + j];
+
+    int i=0, j=0, k=l;
+    while(i<n1 && j<n2) {
+        if(L[i].age <= R[j].age) arr[k++] = L[i++];
+        else arr[k++] = R[j++];
+    }
+    while(i<n1) arr[k++] = L[i++];
+    while(j<n2) arr[k++] = R[j++];
+}
+
+// Recursive Merge Sort
+void mergeSort(Employee arr[], int l, int r) {
+    if(l < r) {
+        int m = l + (r - l)/2;
+        mergeSort(arr, l, m);
+        mergeSort(arr, m+1, r);
+        merge(arr, l, m, r);
+    }
+}
+
+int main() {
+    FILE *fin, *fout;
+    Employee emp[100];
+    int count = 0;
+
+    fin = fopen("employee.txt", "r");
+    if(!fin) {
+        printf("Error opening file!\n");
+        return 1;
+    }
+
+    while(fscanf(fin, "%s %d %f", emp[count].name, &emp[count].age, &emp[count].salary) != EOF) {
+        count++;
+    }
+    fclose(fin);
+
+    mergeSort(emp, 0, count-1);
+
+    fout = fopen("sortedemponage.txt", "w");
+    if(!fout) {
+        printf("Error creating file!\n");
+        return 1;
+    }
+
+    for(int i = 0; i < count; i++) {
+        fprintf(fout, "%s %d %.2f\n", emp[i].name, emp[i].age, emp[i].salary);
+    }
+    fclose(fout);
+
+    printf("Data sorted by age and written to 'sortedemponage.txt'\n");
+    return 0;
+}
+```
+
+---
+
+### **Option 2: Static Stack Implementation of Integers**
+
+```c
+#include <stdio.h>
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+void initialize() {
+    top = -1;
+}
+
+void push(int value) {
+    if(top == MAX-1) {
+        printf("Stack Overflow!\n");
+        return;
+    }
+    stack[++top] = value;
+}
+
+int pop() {
+    if(top == -1) {
+        printf("Stack Underflow!\n");
+        return -1;
+    }
+    return stack[top--];
+}
+
+int isEmpty() {
+    return top == -1;
+}
+
+int isFull() {
+    return top == MAX-1;
+}
+
+int peek() {
+    if(top == -1) {
+        printf("Stack is empty.\n");
+        return -1;
+    }
+    return stack[top];
+}
+
+int main() {
+    initialize();
+    int choice, value;
+
+    do {
+        printf("\nMenu:\n1. Push\n2. Pop\n3. Peek\n4. IsEmpty\n5. IsFull\n6. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        switch(choice) {
+            case 1:
+                printf("Enter value to push: ");
+                scanf("%d", &value);
+                push(value);
+                break;
+            case 2:
+                printf("Popped value: %d\n", pop());
+                break;
+            case 3:
+                printf("Top value: %d\n", peek());
+                break;
+            case 4:
+                if(isEmpty()) printf("Stack is empty.\n");
+                else printf("Stack is not empty.\n");
+                break;
+            case 5:
+                if(isFull()) printf("Stack is full.\n");
+                else printf("Stack is not full.\n");
+                break;
+            case 6:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice.\n");
+        }
+    } while(choice != 6);
+
+    return 0;
+}
+```
+
+---
+
+## **Section II: PostgreSQL**
+
+### **A. Create Tables and Insert Records**
+
+```sql
+-- Customer Table
+CREATE TABLE Customer (
+    cust_no SERIAL PRIMARY KEY,
+    cust_name VARCHAR(50),
+    cust_city VARCHAR(50),
+    phone_no VARCHAR(15)
+);
+
+-- Account Table
+CREATE TABLE Account (
+    acc_no SERIAL PRIMARY KEY,
+    acc_type VARCHAR(10) CHECK(acc_type IN ('Saving', 'Current')),
+    balance NUMERIC(15,2),
+    cust_no INT REFERENCES Customer(cust_no)
+);
+
+-- Sample data
+INSERT INTO Customer (cust_name, cust_city, phone_no) VALUES
+('Mr.Agarwal', 'Delhi', '9876543210'),
+('Mr.Patel', 'Mumbai', '9876512340'),
+('Ms.Sharma', 'Delhi', '9876523450'),
+('Mr.Kumar', 'Ahilyanagar', '9876534560');
+
+INSERT INTO Account (acc_type, balance, cust_no) VALUES
+('Saving', 500000, 1),
+('Current', 1200000, 1),
+('Saving', 750000, 2),
+('Current', 2500000, 3),
+('Saving', 600000, 4);
+```
+
+---
+
+### **B. Queries (Any 3)**
+
+```sql
+-- i. Names of all Customers staying in "Delhi"
+SELECT cust_name FROM Customer WHERE cust_city='Delhi';
+
+-- ii. Total balance of all Saving accounts
+SELECT SUM(balance) AS total_saving_balance FROM Account WHERE acc_type='Saving';
+
+-- iii. Maximum balance of an account
+SELECT MAX(balance) AS max_balance FROM Account;
+
+-- iv. Increase balance of account no 101123 by 10000
+UPDATE Account SET balance = balance + 10000 WHERE acc_no = 101123;
+
+-- v. Add column "AADHAR number" to customer table
+ALTER TABLE Customer ADD COLUMN aadhar_no VARCHAR(12);
+```
+
+---
+
+### **C. Advanced Query / View**
+
+**Query: Names and phone numbers of Current account holders with balance > 1,000,000**
+
+```sql
+SELECT c.cust_name, c.phone_no
+FROM Customer c
+JOIN Account a ON c.cust_no = a.cust_no
+WHERE a.acc_type='Current' AND a.balance > 1000000;
+```
+
+**OR Create a view: Customers having Saving account and not staying in "Ahilyanagar"**
+
+```sql
+CREATE VIEW SavingCustomers_NotAhilyanagar AS
+SELECT DISTINCT c.cust_name, c.cust_city, c.phone_no, a.balance
+FROM Customer c
+JOIN Account a ON c.cust_no = a.cust_no
+WHERE a.acc_type='Saving' AND c.cust_city <> 'Ahilyanagar';
+```
+
+---
+
+✅ This solution includes:
+
+* **C programs** for Merge Sort on file data and static stack operations.
+* **PostgreSQL** tables, inserts, queries, and advanced query/view.
+
+I can also **combine both C options into a single menu-driven program** so the user can choose either Merge Sort or Stack operations. Do you want me to do that?
