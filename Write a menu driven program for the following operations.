@@ -1,0 +1,258 @@
+
+## **Section I: C Programming**
+
+### **Option 1: Menu-driven program to reverse a linked list**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct Node {
+    char data[50];
+    struct Node* next;
+} Node;
+
+Node* head = NULL;
+
+// Create a linked list
+void createList(int n) {
+    Node *temp, *p;
+    char str[50];
+    for (int i = 0; i < n; i++) {
+        printf("Enter element %d: ", i + 1);
+        scanf("%s", str);
+        temp = (Node*)malloc(sizeof(Node));
+        strcpy(temp->data, str);
+        temp->next = NULL;
+
+        if (head == NULL) head = temp;
+        else {
+            p = head;
+            while (p->next) p = p->next;
+            p->next = temp;
+        }
+    }
+}
+
+// Display linked list
+void displayList() {
+    Node* p = head;
+    if (!p) {
+        printf("List is empty.\n");
+        return;
+    }
+    while (p) {
+        printf("%s -> ", p->data);
+        p = p->next;
+    }
+    printf("NULL\n");
+}
+
+// Reverse linked list
+void reverseList() {
+    Node *prev = NULL, *current = head, *next;
+    while (current) {
+        next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    head = prev;
+}
+
+int main() {
+    int choice, n;
+
+    do {
+        printf("\nMenu:\n1. Create List\n2. Display List\n3. Reverse List\n4. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter number of elements: ");
+                scanf("%d", &n);
+                createList(n);
+                break;
+            case 2:
+                displayList();
+                break;
+            case 3:
+                reverseList();
+                printf("List reversed.\n");
+                displayList();
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
+```
+
+---
+
+### **Option 2: Read cities from file and search using linear search**
+
+```c
+#include <stdio.h>
+#include <string.h>
+
+typedef struct {
+    char city[50];
+    int std_code;
+} City;
+
+#define TOTAL_CITIES 10
+
+void acceptAndDisplay(City cities[]) {
+    printf("City list:\n");
+    for (int i = 0; i < TOTAL_CITIES; i++) {
+        printf("%s - %d\n", cities[i].city, cities[i].std_code);
+    }
+}
+
+int linearSearch(City cities[], char name[]) {
+    for (int i = 0; i < TOTAL_CITIES; i++) {
+        if (strcasecmp(cities[i].city, name) == 0)
+            return i; // Found
+    }
+    return -1; // Not found
+}
+
+int main() {
+    FILE *fptr;
+    City cities[TOTAL_CITIES];
+    char searchCity[50];
+
+    fptr = fopen("cities.txt", "r");
+    if (!fptr) {
+        printf("Error opening file!\n");
+        return 1;
+    }
+
+    for (int i = 0; i < TOTAL_CITIES; i++) {
+        fscanf(fptr, "%s %d", cities[i].city, &cities[i].std_code);
+    }
+    fclose(fptr);
+
+    acceptAndDisplay(cities);
+
+    printf("Enter city name to search: ");
+    scanf("%s", searchCity);
+
+    int index = linearSearch(cities, searchCity);
+    if (index != -1)
+        printf("STD code of %s is %d\n", cities[index].city, cities[index].std_code);
+    else
+        printf("City not in the list.\n");
+
+    return 0;
+}
+```
+
+---
+
+## **Section II: PostgreSQL**
+
+### **A. Create Tables and Insert Records**
+
+```sql
+-- Student Table
+CREATE TABLE Student (
+    sno SERIAL PRIMARY KEY,
+    s_name VARCHAR(50),
+    s_class VARCHAR(2) CHECK (s_class IN ('FY','SY','TY'))
+);
+
+-- Teacher Table
+CREATE TABLE Teacher (
+    tno SERIAL PRIMARY KEY,
+    t_name VARCHAR(50),
+    yrs_experience INT
+);
+
+-- Student-Teacher relationship (Many-to-Many with Subject)
+CREATE TABLE Student_Teacher (
+    sno INT REFERENCES Student(sno),
+    tno INT REFERENCES Teacher(tno),
+    subject VARCHAR(50),
+    PRIMARY KEY(sno, tno, subject)
+);
+
+-- Sample inserts
+INSERT INTO Student (s_name, s_class) VALUES
+('Amit', 'FY'),
+('Sita', 'SY'),
+('Rohit', 'TY');
+
+INSERT INTO Teacher (t_name, yrs_experience) VALUES
+('Pawar', 10),
+('Sharma', 4),
+('Patil', 6);
+
+INSERT INTO Student_Teacher (sno, tno, subject) VALUES
+(1, 1, 'Data Structure'),
+(2, 3, 'Data Structure'),
+(2, 2, 'Mathematics'),
+(3, 1, 'Algorithms');
+```
+
+---
+
+### **B. Queries (Any 3)**
+
+```sql
+-- i. List teachers who have more than 5 years experience
+SELECT t_name FROM Teacher WHERE yrs_experience > 5;
+
+-- ii. Count all students who have taken subject “Data Structure”
+SELECT COUNT(DISTINCT sno) FROM Student_Teacher WHERE subject='Data Structure';
+
+-- iii. List the names of all students from SY Class
+SELECT s_name FROM Student WHERE s_class='SY';
+
+-- iv. Change experience of teacher named “Pawar” to 20
+UPDATE Teacher SET yrs_experience=20 WHERE t_name='Pawar';
+
+-- v. Display classwise details of students
+SELECT s_class, ARRAY_AGG(s_name) AS students FROM Student GROUP BY s_class;
+```
+
+---
+
+### **C. Advanced Query / View**
+
+**Query: List names of all teachers with subjects and student names**
+
+```sql
+SELECT t.t_name, st.subject, s.s_name
+FROM Teacher t
+JOIN Student_Teacher st ON t.tno = st.tno
+JOIN Student s ON s.sno = st.sno;
+```
+
+**OR Create a view to find teacher teaching maximum number of subjects**
+
+```sql
+CREATE VIEW MaxSubjectTeacher AS
+SELECT t.t_name, COUNT(st.subject) AS subject_count
+FROM Teacher t
+JOIN Student_Teacher st ON t.tno = st.tno
+GROUP BY t.t_name
+ORDER BY subject_count DESC
+LIMIT 1;
+```
+
+---
+
+✅ This solution includes:
+
+* **C program** for linked list reversal and city search with linear search.
+* **PostgreSQL** tables, inserts, queries, and advanced queries/views.
+
+I can also **combine both C options into a single menu-driven program** so the user can choose either operation if you want. Do you want me to do that?
