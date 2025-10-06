@@ -1,0 +1,338 @@
+Section I: Data Structures
+
+Q1: Write a menu-driven program for the following operations on a doubly linked list:
+
+This is the Doubly Linked List implementation for the operations mentioned:
+
+1. Create and display the linked list.
+
+
+2. Reverse the linked list and display it.
+
+
+
+Here is the C code:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the Node structure for doubly linked list
+struct Node {
+    int data;
+    struct Node* next;
+    struct Node* prev;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    newNode->prev = NULL;
+    return newNode;
+}
+
+// Function to create and display the doubly linked list
+void createAndDisplayList() {
+    struct Node* head = NULL;
+    struct Node* tail = NULL;
+    int n, data;
+
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter the elements: \n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &data);
+        struct Node* newNode = createNode(data);
+        
+        if (head == NULL) {
+            head = newNode;  // First node becomes head
+            tail = newNode;  // Tail points to the first node
+        } else {
+            tail->next = newNode;  // Link the new node to the tail
+            newNode->prev = tail;  // Set the previous pointer of the new node to tail
+            tail = newNode;        // Move tail to the new node
+        }
+    }
+
+    // Display the linked list
+    printf("The linked list is: ");
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+    printf("\n");
+}
+
+// Function to reverse and display the doubly linked list
+void reverseAndDisplayList(struct Node* head) {
+    if (head == NULL) {
+        printf("The list is empty.\n");
+        return;
+    }
+
+    struct Node* temp = head;
+    // Traverse to the last node
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
+
+    // Print the list in reverse order
+    printf("Reversed linked list: ");
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->prev;
+    }
+    printf("\n");
+}
+
+int main() {
+    int choice;
+    struct Node* head = NULL;
+
+    do {
+        printf("\nMenu:\n");
+        printf("1. Create and display the linked list\n");
+        printf("2. Reverse and display the linked list\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                createAndDisplayList();
+                break;
+            case 2:
+                reverseAndDisplayList(head);
+                break;
+            case 3:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    } while (choice != 3);
+
+    return 0;
+}
+
+Explanation:
+
+1. createNode: Creates a new node and initializes the data.
+
+
+2. createAndDisplayList: This function creates the doubly linked list by accepting input values and links the nodes together. It then displays the linked list.
+
+
+3. reverseAndDisplayList: This function reverses the list and displays it by first traversing to the end and then moving backward using the prev pointers.
+
+
+4. Main Function: The user can interact with the menu to either create/display the list or reverse it.
+
+
+
+
+---
+
+Q1 OR: Perform the following operations using static implementation of stack
+
+We will use a static stack for the following operations:
+
+1. Accept n integers from the user and push them into the stack.
+
+
+2. Pop an element from the stack and display it.
+
+
+
+Here’s the C code for the static stack:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 5  // Define the maximum size of the stack
+
+// Stack structure
+struct Stack {
+    int arr[MAX];
+    int top;
+};
+
+// Function to initialize the stack
+void initializeStack(struct Stack* stack) {
+    stack->top = -1;  // Empty stack
+}
+
+// Function to check if the stack is full
+int isFull(struct Stack* stack) {
+    return stack->top == MAX - 1;
+}
+
+// Function to check if the stack is empty
+int isEmpty(struct Stack* stack) {
+    return stack->top == -1;
+}
+
+// Function to push an element into the stack
+void push(struct Stack* stack, int value) {
+    if (isFull(stack)) {
+        printf("Stack Overflow! Cannot push %d\n", value);
+        return;
+    }
+    stack->arr[++stack->top] = value;
+    printf("Pushed %d into stack.\n", value);
+}
+
+// Function to pop an element from the stack
+int pop(struct Stack* stack) {
+    if (isEmpty(stack)) {
+        printf("Stack Underflow! No elements to pop.\n");
+        return -1;
+    }
+    return stack->arr[stack->top--];
+}
+
+int main() {
+    struct Stack stack;
+    int n, value;
+
+    // Initialize stack
+    initializeStack(&stack);
+
+    printf("Enter the number of elements to push: ");
+    scanf("%d", &n);
+
+    // Push n elements into the stack
+    for (int i = 0; i < n; i++) {
+        printf("Enter element %d: ", i + 1);
+        scanf("%d", &value);
+        push(&stack, value);
+    }
+
+    // Pop and display elements
+    if (!isEmpty(&stack)) {
+        int poppedValue = pop(&stack);
+        if (poppedValue != -1) {
+            printf("Popped element: %d\n", poppedValue);
+        }
+    }
+
+    return 0;
+}
+
+Explanation:
+
+1. initializeStack: Initializes the stack by setting the top index to -1 to indicate the stack is empty.
+
+
+2. isFull: Checks if the stack is full.
+
+
+3. isEmpty: Checks if the stack is empty.
+
+
+4. push: Adds an element to the top of the stack if the stack is not full.
+
+
+5. pop: Removes an element from the top of the stack if the stack is not empty.
+
+
+6. Main Function: Accepts n integers from the user, pushes them into the stack, and pops an element from the stack to display.
+
+
+
+
+---
+
+Section II: Database Management Systems
+
+Q2A) Create the database and insert records in PostgreSQL
+
+-- Create the Customer table
+CREATE TABLE Customer (
+    cno SERIAL PRIMARY KEY,
+    cust_name VARCHAR(100),
+    cust_city VARCHAR(100)
+);
+
+-- Create the Account table
+CREATE TABLE Account (
+    ano SERIAL PRIMARY KEY,
+    acc_type VARCHAR(50) CHECK (acc_type IN ('Saving', 'Current')),
+    balance DECIMAL(10, 2),
+    cno INT,
+    FOREIGN KEY (cno) REFERENCES Customer(cno)
+);
+
+-- Insert sample records into Customer table
+INSERT INTO Customer (cust_name, cust_city) VALUES
+('Sahil', 'Pune'),
+('Rahul', 'Mumbai'),
+('Priya', 'Delhi'),
+('Amit', 'Chennai'),
+('Neha', 'Bangalore');
+
+-- Insert sample records into Account table
+INSERT INTO Account (acc_type, balance, cno) VALUES
+('Saving', 50000.00, 1),
+('Current', 10000.00, 2),
+('Saving', 20000.00, 3),
+('Saving', 35000.00, 4),
+('Current', 15000.00, 5);
+
+
+---
+
+Q2B) Execute the following queries in PostgreSQL
+
+1. i. Count the number of customers whose name contains the substring “in”.
+
+
+
+SELECT COUNT(*) 
+FROM Customer 
+WHERE cust_name LIKE '%in%';
+
+2. ii. Give the average balance of all Current accounts.
+
+
+
+SELECT AVG(balance) 
+FROM Account 
+WHERE acc_type = 'Current';
+
+3. iii. Display details of accounts in sorted order of balance.
+
+
+
+SELECT * 
+FROM Account
+ORDER BY balance DESC;
+
+4. iv. Increase the balance of all accounts of customer named "Sahil" by Rs 10000.
+
+
+
+UPDATE Account 
+SET balance = balance + 10000 
+WHERE cno = (SELECT cno FROM Customer WHERE cust_name = 'Sahil');
+
+5. v. Add a column “phone_no” to the customer table.
+
+
+
+ALTER TABLE Customer 
+ADD COLUMN phone_no VARCHAR(15);
+
+
+---
+
+Q2C) Write a query to list the city-wise customer names having minimum balance.
+
+SELECT c.cust_city, c.cust_name, a.balance
+FROM Customer c
+JOIN Account a ON c.cno = a.cno
+WHERE a.balance = (SELECT MIN(balance
+
