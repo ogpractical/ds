@@ -1,0 +1,285 @@
+
+# 🧮 **Section I: C Programming (15 Marks)**
+
+---
+
+## **Option 1: Dynamic Implementation of Stack**
+
+### **i. Accept n integers from user and push into stack**
+
+### **ii. Reverse a string using stack and check palindrome**
+
+### ✅ **C Program:**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure for stack node
+struct Node {
+    char data;
+    struct Node* next;
+};
+
+struct Node* top = NULL;
+
+// Function prototypes
+void push(char);
+char pop();
+int isEmpty();
+void pushInt(int);
+int popInt();
+
+struct Node* topInt = NULL;
+
+// ---------------- Integer Stack Functions ----------------
+void pushInt(int val) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = val;
+    newNode->next = topInt;
+    topInt = newNode;
+}
+
+int popInt() {
+    if (topInt == NULL) {
+        printf("Stack Underflow!\n");
+        return -1;
+    }
+    struct Node* temp = topInt;
+    int val = temp->data;
+    topInt = topInt->next;
+    free(temp);
+    return val;
+}
+
+// ---------------- Character Stack Functions ----------------
+void push(char ch) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = ch;
+    newNode->next = top;
+    top = newNode;
+}
+
+char pop() {
+    if (top == NULL)
+        return '\0';
+    struct Node* temp = top;
+    char ch = temp->data;
+    top = top->next;
+    free(temp);
+    return ch;
+}
+
+int isEmpty() {
+    return top == NULL;
+}
+
+// ---------------- Main Program ----------------
+int main() {
+    int choice, n, i, val;
+    char str[100], rev[100];
+
+    while (1) {
+        printf("\n--- STACK MENU ---\n");
+        printf("1. Push Integers into Stack\n");
+        printf("2. Reverse String and Check Palindrome\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        getchar(); // clear newline
+
+        switch (choice) {
+            case 1:
+                printf("Enter number of integers: ");
+                scanf("%d", &n);
+                for (i = 0; i < n; i++) {
+                    printf("Enter element %d: ", i + 1);
+                    scanf("%d", &val);
+                    pushInt(val);
+                }
+                printf("All elements pushed successfully!\n");
+                break;
+
+            case 2:
+                printf("Enter a string: ");
+                gets(str);
+                for (i = 0; i < strlen(str); i++)
+                    push(str[i]);
+
+                i = 0;
+                while (!isEmpty())
+                    rev[i++] = pop();
+                rev[i] = '\0';
+
+                printf("Reversed String: %s\n", rev);
+
+                if (strcmp(str, rev) == 0)
+                    printf("The string is a PALINDROME.\n");
+                else
+                    printf("The string is NOT a palindrome.\n");
+                break;
+
+            case 3:
+                exit(0);
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+}
+```
+
+---
+
+## **OR Option 2: Selection Sort Algorithm**
+
+### ✅ **C Program:**
+
+```c
+#include <stdio.h>
+
+int main() {
+    int n, i, j, min, temp;
+    int arr[100];
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    printf("Enter %d elements: ", n);
+    for (i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    // Selection Sort Logic
+    for (i = 0; i < n - 1; i++) {
+        min = i;
+        for (j = i + 1; j < n; j++) {
+            if (arr[j] < arr[min])
+                min = j;
+        }
+        temp = arr[i];
+        arr[i] = arr[min];
+        arr[min] = temp;
+    }
+
+    printf("Sorted Array in Ascending Order:\n");
+    for (i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+
+    return 0;
+}
+```
+
+---
+
+# 🗄️ **Section II: Database Management Systems (15 Marks)**
+
+---
+
+## **A. Create Tables in PostgreSQL**
+
+```sql
+CREATE TABLE Client (
+    clientno INT PRIMARY KEY,
+    name VARCHAR(50),
+    address VARCHAR(100)
+);
+
+CREATE TABLE Sales_order (
+    sorderno INT PRIMARY KEY,
+    s_order_date DATE,
+    order_amt NUMERIC(10,2) CHECK(order_amt > 0),
+    clientno INT REFERENCES Client(clientno)
+);
+```
+
+### **Insert Sample Data:**
+
+```sql
+INSERT INTO Client VALUES
+(10, 'Ravi', 'Nagpur'),
+(20, 'Meena', 'Pune'),
+(30, 'Soham', 'Mumbai'),
+(40, 'Asha', 'Nagpur');
+
+INSERT INTO Sales_order VALUES
+(101, '2024-02-10', 12000, 10),
+(102, '2024-02-20', 15000, 20),
+(103, '2024-02-22', 18000, 30),
+(104, '2024-03-01', 22000, 10),
+(105, '2024-02-15', 9000, 40);
+```
+
+---
+
+## **B. Execute Any 3 Queries**
+
+i. **Update the client address of all clients from “Nagpur” to “Kolhapur”**
+
+```sql
+UPDATE Client
+SET address = 'Kolhapur'
+WHERE address = 'Nagpur';
+```
+
+ii. **Delete all sales orders whose client number is 30**
+
+```sql
+DELETE FROM Sales_order
+WHERE clientno = 30;
+```
+
+iii. **Display all sales records having order date before “23/02/2024”**
+
+```sql
+SELECT * FROM Sales_order
+WHERE s_order_date < '2024-02-23';
+```
+
+iv. **Display sales order having maximum order amount**
+
+```sql
+SELECT * FROM Sales_order
+WHERE order_amt = (SELECT MAX(order_amt) FROM Sales_order);
+```
+
+v. **Add column order_status to the Sales_order table**
+
+```sql
+ALTER TABLE Sales_order ADD COLUMN order_status VARCHAR(20);
+```
+
+---
+
+## **C.**
+
+### **Option 1: Display client details having maximum sales orders**
+
+```sql
+SELECT c.clientno, c.name, c.address
+FROM Client c
+JOIN Sales_order s ON c.clientno = s.clientno
+GROUP BY c.clientno, c.name, c.address
+HAVING COUNT(s.sorderno) = (
+    SELECT MAX(COUNT(sorderno))
+    FROM Sales_order
+    GROUP BY clientno
+);
+```
+
+---
+
+### **OR Option 2: Create a view to list names of clients having more than 2 sales orders**
+
+```sql
+CREATE VIEW ClientsWithMoreThan2Orders AS
+SELECT c.clientno, c.name, COUNT(s.sorderno) AS total_orders
+FROM Client c
+JOIN Sales_order s ON c.clientno = s.clientno
+GROUP BY c.clientno, c.name
+HAVING COUNT(s.sorderno) > 2;
+```
+
+---
+
+Would you like me to generate this entire answer set as a **well-formatted PDF (exam-ready layout with marks and sections)**?
