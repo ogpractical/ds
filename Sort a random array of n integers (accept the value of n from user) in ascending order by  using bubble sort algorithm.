@@ -1,0 +1,226 @@
+
+### **Section I: Data Structures** *(15 marks)*
+
+**Q1) (Option 1): Bubble Sort in Ascending Order**
+
+```python
+# Bubble sort in Python
+
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n-i-1):
+            if arr[j] > arr[j+1]:
+                arr[j], arr[j+1] = arr[j+1], arr[j]
+
+n = int(input("Enter number of elements: "))
+arr = []
+
+for i in range(n):
+    val = int(input(f"Enter element {i+1}: "))
+    arr.append(val)
+
+bubble_sort(arr)
+print("Sorted array is:", arr)
+```
+
+---
+
+**Q1) (Option 2): Menu Driven Program for Doubly Linked List**
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.prev = None
+        self.next = None
+
+class DoublyLinkedList:
+    def __init__(self):
+        self.head = None
+
+    def create_list(self, n):
+        for i in range(n):
+            data = int(input(f"Enter data for node {i+1}: "))
+            self.insert_end(data)
+
+    def insert_end(self, data):
+        new_node = Node(data)
+        if self.head is None:
+            self.head = new_node
+            return
+        temp = self.head
+        while temp.next:
+            temp = temp.next
+        temp.next = new_node
+        new_node.prev = temp
+
+    def insert_at_position(self, data, pos):
+        new_node = Node(data)
+        if pos == 1:
+            new_node.next = self.head
+            if self.head:
+                self.head.prev = new_node
+            self.head = new_node
+            return
+        temp = self.head
+        for i in range(pos - 2):
+            if temp is None:
+                print("Position out of range")
+                return
+            temp = temp.next
+        new_node.next = temp.next
+        new_node.prev = temp
+        if temp.next:
+            temp.next.prev = new_node
+        temp.next = new_node
+
+    def display(self):
+        temp = self.head
+        print("Doubly Linked List:")
+        while temp:
+            print(temp.data, end=" <-> ")
+            temp = temp.next
+        print("None")
+
+dll = DoublyLinkedList()
+while True:
+    print("\n1. Create list\n2. Insert at position\n3. Display\n4. Exit")
+    choice = int(input("Enter choice: "))
+    if choice == 1:
+        n = int(input("How many nodes? "))
+        dll.create_list(n)
+    elif choice == 2:
+        data = int(input("Enter data to insert: "))
+        pos = int(input("Enter position: "))
+        dll.insert_at_position(data, pos)
+    elif choice == 3:
+        dll.display()
+    elif choice == 4:
+        break
+    else:
+        print("Invalid choice")
+```
+
+---
+
+### **Section II: Database Management Systems** *(15 marks)*
+
+#### **A. PostgreSQL Schema Creation**
+
+```sql
+CREATE TABLE Student (
+    sno INT PRIMARY KEY,
+    s_name VARCHAR(50),
+    s_class VARCHAR(2) CHECK (s_class IN ('FY', 'SY', 'TY'))
+);
+
+CREATE TABLE Teacher (
+    tno INT PRIMARY KEY,
+    t_name VARCHAR(50),
+    yrs_experience INT
+);
+
+CREATE TABLE StudentTeacher (
+    sno INT REFERENCES Student(sno),
+    tno INT REFERENCES Teacher(tno),
+    subject VARCHAR(50),
+    PRIMARY KEY (sno, tno, subject)
+);
+```
+
+---
+
+#### **B. SQL Queries (Pick Any 3)**
+
+**i. Class-wise number of students**
+
+```sql
+SELECT s_class, COUNT(*) AS total_students
+FROM Student
+GROUP BY s_class;
+```
+
+**ii. Students studying in class “TY”**
+
+```sql
+SELECT * FROM Student
+WHERE s_class = 'TY';
+```
+
+**iii. Count students who have taken subject “Maths”**
+
+```sql
+SELECT COUNT(DISTINCT sno) AS maths_students
+FROM StudentTeacher
+WHERE subject = 'Maths';
+```
+
+**iv. Delete student with sno “105”**
+
+```sql
+DELETE FROM Student
+WHERE sno = 105;
+```
+
+**v. Add “designation” column to Teacher table**
+
+```sql
+ALTER TABLE Teacher
+ADD designation VARCHAR(50);
+```
+
+---
+
+#### **C. Queries**
+
+**Option 1: List teachers with subjects and student count**
+
+```sql
+SELECT 
+    T.t_name,
+    ST.subject,
+    COUNT(DISTINCT ST.sno) AS total_students
+FROM 
+    Teacher T
+JOIN 
+    StudentTeacher ST ON T.tno = ST.tno
+GROUP BY 
+    T.t_name, ST.subject;
+```
+
+**Option 2: View to find teacher teaching max subjects**
+
+```sql
+CREATE VIEW MaxSubjectsTeacher AS
+SELECT tno
+FROM (
+    SELECT tno, COUNT(DISTINCT subject) AS subject_count
+    FROM StudentTeacher
+    GROUP BY tno
+) AS subquery
+WHERE subject_count = (
+    SELECT MAX(subject_count)
+    FROM (
+        SELECT COUNT(DISTINCT subject) AS subject_count
+        FROM StudentTeacher
+        GROUP BY tno
+    ) AS counts
+);
+```
+
+---
+
+### **Q3) Viva [5 Marks]**
+
+This would be conducted orally, but sample questions might include:
+
+* What is a doubly linked list?
+* How does bubble sort work?
+* Explain foreign key and primary key in databases.
+* What are aggregate functions in SQL?
+* How do you ensure data integrity in databases?
+
+---
+
+Let me know if you want these solutions saved as a document or need code explanations!
