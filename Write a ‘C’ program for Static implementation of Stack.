@@ -1,0 +1,254 @@
+
+## 🧮 **Section I: C Programming (15 marks)**
+
+### **Option 1: Static Implementation of Stack**
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 5
+
+int stack[MAX];
+int top = -1;
+
+// Function prototypes
+void push();
+void pop();
+void display();
+
+int main() {
+    int choice;
+    while (1) {
+        printf("\n---- STACK MENU ----\n");
+        printf("1. Push\n");
+        printf("2. Pop\n");
+        printf("3. Display\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1: push(); break;
+            case 2: pop(); break;
+            case 3: display(); break;
+            case 4: exit(0);
+            default: printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
+
+void push() {
+    int val;
+    if (top == MAX - 1)
+        printf("Stack Overflow!\n");
+    else {
+        printf("Enter value to push: ");
+        scanf("%d", &val);
+        stack[++top] = val;
+        printf("%d pushed onto stack.\n", val);
+    }
+}
+
+void pop() {
+    if (top == -1)
+        printf("Stack Underflow!\n");
+    else
+        printf("%d popped from stack.\n", stack[top--]);
+}
+
+void display() {
+    if (top == -1)
+        printf("Stack is empty.\n");
+    else {
+        printf("Stack elements are:\n");
+        for (int i = top; i >= 0; i--)
+            printf("%d\n", stack[i]);
+    }
+}
+```
+
+---
+
+### **OR Option 2: Counting Sort on Employee File**
+
+#### Input file: `employee.txt`
+
+Each line contains:
+`empid name age salary`
+
+**Example contents:**
+
+```
+101 Amit 25 40000
+102 Neha 22 35000
+103 Ramesh 29 45000
+104 Sneha 23 38000
+```
+
+#### Program:
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 100
+
+struct Employee {
+    int id;
+    char name[50];
+    int age;
+    int salary;
+};
+
+void countingSort(struct Employee emp[], int n, struct Employee sorted[]) {
+    int maxAge = 0;
+    for (int i = 0; i < n; i++)
+        if (emp[i].age > maxAge)
+            maxAge = emp[i].age;
+
+    int count[maxAge + 1];
+    for (int i = 0; i <= maxAge; i++)
+        count[i] = 0;
+
+    for (int i = 0; i < n; i++)
+        count[emp[i].age]++;
+
+    for (int i = 1; i <= maxAge; i++)
+        count[i] += count[i - 1];
+
+    for (int i = n - 1; i >= 0; i--) {
+        sorted[count[emp[i].age] - 1] = emp[i];
+        count[emp[i].age]--;
+    }
+}
+
+int main() {
+    FILE *fp = fopen("employee.txt", "r");
+    if (fp == NULL) {
+        printf("Error opening input file.\n");
+        return 1;
+    }
+
+    struct Employee emp[MAX], sorted[MAX];
+    int n = 0;
+
+    while (fscanf(fp, "%d %s %d %d", &emp[n].id, emp[n].name, &emp[n].age, &emp[n].salary) == 4)
+        n++;
+
+    fclose(fp);
+
+    countingSort(emp, n, sorted);
+
+    FILE *out = fopen("sortedemponage.txt", "w");
+    for (int i = 0; i < n; i++)
+        fprintf(out, "%d %s %d %d\n", sorted[i].id, sorted[i].name, sorted[i].age, sorted[i].salary);
+
+    fclose(out);
+    printf("Data sorted by age and written to sortedemponage.txt\n");
+    return 0;
+}
+```
+
+---
+
+## 🗄️ **Section II: Database Management Systems (15 marks)**
+
+### **A. Table Creation in PostgreSQL**
+
+```sql
+CREATE TABLE Emp (
+    eno INT PRIMARY KEY,
+    ename VARCHAR(50),
+    salary NUMERIC(10,2)
+);
+
+CREATE TABLE Project (
+    pno INT PRIMARY KEY,
+    pname VARCHAR(50),
+    budget NUMERIC(12,2)
+);
+
+CREATE TABLE EmpProject (
+    eno INT REFERENCES Emp(eno),
+    pno INT REFERENCES Project(pno),
+    total_hours INT,
+    PRIMARY KEY (eno, pno)
+);
+```
+
+#### Insert Sample Records:
+
+```sql
+INSERT INTO Emp VALUES (1, 'Rekha', 40000), (2, 'Amit', 45000), (3, 'Neha', 50000);
+INSERT INTO Project VALUES (10, 'Alpha', 80000), (11, 'Beta', 60000);
+INSERT INTO EmpProject VALUES (1, 10, 120), (2, 10, 90), (3, 11, 150);
+```
+
+---
+
+### **B. Execute any 3 Queries**
+
+i. **Find the maximum budget**
+
+```sql
+SELECT MAX(budget) AS max_budget FROM Project;
+```
+
+ii. **Increase the salary of all employees by 10%**
+
+```sql
+UPDATE Emp SET salary = salary * 1.10;
+```
+
+iii. **Count number of projects with duration > 100 hrs**
+
+```sql
+SELECT COUNT(DISTINCT pno) AS total_projects
+FROM EmpProject
+WHERE total_hours > 100;
+```
+
+iv. **List all employees whose name ends with “a”**
+
+```sql
+SELECT * FROM Emp WHERE ename LIKE '%a';
+```
+
+v. **Add column contact_number to employee table**
+
+```sql
+ALTER TABLE Emp ADD COLUMN contact_number VARCHAR(15);
+```
+
+---
+
+### **C.**
+
+#### **Option 1: Employees not working on any project**
+
+```sql
+SELECT ename
+FROM Emp
+WHERE eno NOT IN (SELECT eno FROM EmpProject);
+```
+
+#### **OR Option 2: Create a view for project with maximum hours**
+
+```sql
+CREATE VIEW MaxHoursProject AS
+SELECT p.pno, p.pname, p.budget, SUM(e.total_hours) AS total_hours
+FROM Project p
+JOIN EmpProject e ON p.pno = e.pno
+GROUP BY p.pno, p.pname, p.budget
+HAVING SUM(e.total_hours) = (
+    SELECT MAX(SUM(total_hours))
+    FROM EmpProject
+    GROUP BY pno
+);
+```
+
+---
+
+Would you like me to combine these answers into a **formatted PDF** (exam-ready version with headings and marks allocation)?
