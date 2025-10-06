@@ -1,0 +1,294 @@
+
+✅ SECTION I: DATA STRUCTURES (15 Marks)
+
+Q1 (a) Recursive Quick Sort in C
+
+#include <stdio.h>
+
+void quickSort(int arr[], int low, int high);
+int partition(int arr[], int low, int high);
+
+int main() {
+    int n, i;
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter %d integers:\n", n);
+    for (i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    quickSort(arr, 0, n - 1);
+
+    printf("Sorted array in ascending order:\n");
+    for (i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+
+    return 0;
+}
+
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];
+    int i = low - 1, temp;
+
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            temp = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+    }
+    temp = arr[i + 1];
+    arr[i + 1] = arr[high];
+    arr[high] = temp;
+    return (i + 1);
+}
+
+🧠 Concepts:
+
+Recursive function calls itself on smaller subarrays.
+
+Pivot: last element used to divide list.
+
+Complexity:
+
+Average = O(n log n)
+
+Worst = O(n²)
+
+
+
+
+---
+
+OR Q1 (b) Linear Search on Random Array in C
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int main() {
+    int n, i, x, found = 0;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    srand(time(0));  // random seed
+
+    printf("Generated random array:\n");
+    for (i = 0; i < n; i++) {
+        arr[i] = rand() % 100; // 0–99
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    printf("Enter value to search: ");
+    scanf("%d", &x);
+
+    for (i = 0; i < n; i++) {
+        if (arr[i] == x) {
+            printf("%d found at position %d (0-based index)\n", x, i);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found)
+        printf("%d not found in array\n", x);
+
+    return 0;
+}
+
+🧠 Concepts:
+
+Uses rand() for random numbers.
+
+Linear search checks sequentially → O(n) time.
+
+
+
+---
+
+✅ SECTION II: DATABASE MANAGEMENT SYSTEMS (15 Marks)
+
+We’ll solve this using PostgreSQL SQL queries, as required in your exam.
+
+
+---
+
+Q2) Database: Person–Area (many-to-one)
+
+Schema:
+
+Area(aname, area_type, pincode)
+
+Person(pnumber, pname, birthdate, income, area_name)
+
+Foreign Key → references Area(aname)
+
+
+
+
+---
+
+A. Create Tables & Insert Records
+
+-- Create Area table
+CREATE TABLE Area (
+  aname VARCHAR(50) PRIMARY KEY,
+  area_type VARCHAR(10) CHECK (area_type IN ('urban','rural')),
+  pincode VARCHAR(10)
+);
+
+-- Create Person table
+CREATE TABLE Person (
+  pnumber SERIAL PRIMARY KEY,
+  pname VARCHAR(50) NOT NULL,
+  birthdate DATE,
+  income NUMERIC(10,2),
+  area_name VARCHAR(50) REFERENCES Area(aname)
+);
+
+-- Insert data
+INSERT INTO Area VALUES
+('Camp', 'urban', '411001'),
+('kalyaninagar', 'urban', '411014'),
+('Shivajinagar', 'urban', '411005'),
+('Hadapsar', 'rural', '412308');
+
+INSERT INTO Person (pname, birthdate, income, area_name) VALUES
+('Ramesh', '1995-07-12', 45000, 'Camp'),
+('Rina', '1997-03-20', 35000, 'kalyaninagar'),
+('Rahul', '1992-12-22', 60000, 'kalyaninagar'),
+('Amit', '1998-07-05', 30000, 'Camp'),
+('Neha', '1994-11-15', 25000, 'Hadapsar');
+
+
+---
+
+B. Execute Any 3 of the Following Queries
+
+
+---
+
+(i) List the details of all people whose name starts with R.
+
+SELECT * FROM Person
+WHERE pname LIKE 'R%';
+
+
+---
+
+(ii) List the names of all people whose birthday falls in the month of July.
+
+SELECT pname, birthdate
+FROM Person
+WHERE EXTRACT(MONTH FROM birthdate) = 7;
+
+
+---
+
+(iii) Display the details of people in sorted order of their income.
+
+SELECT * FROM Person
+ORDER BY income;
+
+
+---
+
+(iv) Display the count of areas of ‘urban’ type.
+
+SELECT COUNT(*) AS urban_area_count
+FROM Area
+WHERE area_type = 'urban';
+
+
+---
+
+(v) Change the pincode of ‘kalyaninagar’ to 411036.
+
+UPDATE Area
+SET pincode = '411036'
+WHERE aname = 'kalyaninagar';
+
+
+---
+
+C. Write a Query
+
+> List the names of people who live in ‘Camp’ area and have income less than at least one person who lives in ‘kalyaninagar’ area.
+
+
+
+SELECT pname, income, area_name
+FROM Person
+WHERE area_name = 'Camp'
+  AND income < (SELECT MAX(income) FROM Person WHERE area_name = 'kalyaninagar');
+
+
+---
+
+OR
+
+> Create a view to list the details of the person with second maximum income.
+
+
+
+CREATE OR REPLACE VIEW second_max_income AS
+SELECT pnumber, pname, birthdate, income, area_name
+FROM Person
+WHERE income = (
+  SELECT MAX(income) FROM Person
+  WHERE income < (SELECT MAX(income) FROM Person)
+);
+
+Then you can see results using:
+
+SELECT * FROM second_max_income;
+
+
+---
+
+✅ SECTION III: Viva (5 Marks)
+
+Prepare answers for:
+
+Question	Key Points
+
+Explain QuickSort	Divide & Conquer, recursive, partition pivot
+QuickSort Time Complexity	Average O(n log n), Worst O(n²)
+Linear Search	Sequential search, O(n)
+Difference between primary & foreign key	Primary uniquely identifies, foreign references it
+Many-to-One relationship	Many Persons belong to one Area
+SQL functions used	EXTRACT(), MAX(), LIKE, subqueries, VIEW
+DDL vs DML	DDL = Create/Alter, DML = Insert/Update/Delete
+
+
+
+---
+
+🎯 Marks Distribution Recap
+
+Section	Question	Marks
+
+I	Data Structure (QuickSort / Linear Search)	15
+II	DBMS (Create + Queries + View)	15
+III	Viva	5
+Total		35 Marks
+
+
+
+---
+
+Would you like me to combine all C programs + SQL queries into a single ready-to-print .pdf or .docx practical file for submission or printout?
