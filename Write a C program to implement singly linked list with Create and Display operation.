@@ -1,0 +1,219 @@
+
+Section I: Data Structures
+
+Q1. Write a C program to implement singly linked list with Create and Display operation.
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define structure for node
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+struct Node *head = NULL;
+
+// Function to create linked list
+void createList(int n) {
+    struct Node *newNode, *temp;
+    int data, i;
+
+    if (n <= 0) {
+        printf("Invalid number of nodes.\n");
+        return;
+    }
+
+    head = (struct Node *)malloc(sizeof(struct Node));
+    printf("Enter data for node 1: ");
+    scanf("%d", &data);
+    head->data = data;
+    head->next = NULL;
+    temp = head;
+
+    for (i = 2; i <= n; i++) {
+        newNode = (struct Node *)malloc(sizeof(struct Node));
+        printf("Enter data for node %d: ", i);
+        scanf("%d", &data);
+        newNode->data = data;
+        newNode->next = NULL;
+        temp->next = newNode;
+        temp = newNode;
+    }
+}
+
+// Function to display linked list
+void displayList() {
+    struct Node *temp = head;
+
+    if (head == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+
+    printf("Linked List Elements: ");
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    int n;
+    printf("Enter total number of nodes: ");
+    scanf("%d", &n);
+
+    createList(n);
+    displayList();
+
+    return 0;
+}
+
+
+---
+
+Section II: Database Management Systems
+
+Given:
+
+Doctor(dno, dname, city)
+Patient(pno, pat_name, city, disease)
+Doctor-Patient (many-to-many) with Fees attribute
+
+
+---
+
+A. Create database and insert records (PostgreSQL)
+
+CREATE TABLE Doctor (
+    dno INT PRIMARY KEY,
+    dname VARCHAR(50),
+    city VARCHAR(50)
+);
+
+CREATE TABLE Patient (
+    pno INT PRIMARY KEY,
+    pat_name VARCHAR(50),
+    city VARCHAR(50),
+    disease VARCHAR(50)
+);
+
+CREATE TABLE Doctor_Patient (
+    dno INT REFERENCES Doctor(dno),
+    pno INT REFERENCES Patient(pno),
+    fees DECIMAL(10,2),
+    PRIMARY KEY (dno, pno)
+);
+
+-- Insert sample records
+INSERT INTO Doctor VALUES 
+(1, 'Dr. Patil', 'Nagpur'),
+(2, 'Dr. Kumar', 'Pune'),
+(3, 'Dr. Mehta', 'Nagpur');
+
+INSERT INTO Patient VALUES 
+(101, 'Amit', 'Nagpur', 'Asthama'),
+(102, 'Sneha', 'Pune', 'Cancer'),
+(103, 'Anil', 'Nagpur', 'Asthama'),
+(104, 'Ajay', 'Pune', 'Fever');
+
+INSERT INTO Doctor_Patient VALUES
+(1, 101, 200),
+(2, 102, 250),
+(2, 103, 200),
+(3, 104, 150);
+
+
+---
+
+B. Execute the following queries (any 3)
+
+i. List all doctors from ‘Nagpur’ city.
+
+SELECT * FROM Doctor WHERE city = 'Nagpur';
+
+ii. Display count of patients.
+
+SELECT COUNT(*) AS Total_Patients FROM Patient;
+
+iii. List names of patients suffering from ‘Cancer’.
+
+SELECT pat_name FROM Patient WHERE disease = 'Cancer';
+
+iv. Change the city of ‘Dr. Patil’ to Pune.
+
+UPDATE Doctor SET city = 'Pune' WHERE dname = 'Dr. Patil';
+
+v. List the names of patients that start with alphabet ‘A’.
+
+SELECT pat_name FROM Patient WHERE pat_name LIKE 'A%';
+
+
+---
+
+C. Query to find number of patients suffering from Asthama with Rs.200 fee by Dr. Kumar
+
+SELECT COUNT(*) AS Asthama_Patients
+FROM Doctor_Patient dp
+JOIN Doctor d ON dp.dno = d.dno
+JOIN Patient p ON dp.pno = p.pno
+WHERE p.disease = 'Asthama' 
+AND dp.fees = 200
+AND d.dname = 'Dr. Kumar';
+
+
+---
+
+OR – Create a view to find doctor who treats maximum number of patients
+
+CREATE VIEW MaxPatientDoctor AS
+SELECT d.dname, COUNT(dp.pno) AS total_patients
+FROM Doctor d
+JOIN Doctor_Patient dp ON d.dno = dp.dno
+GROUP BY d.dname
+HAVING COUNT(dp.pno) = (
+    SELECT MAX(patient_count)
+    FROM (
+        SELECT COUNT(pno) AS patient_count
+        FROM Doctor_Patient
+        GROUP BY dno
+    ) AS subquery
+);
+
+
+---
+
+Section III: Viva [5 Marks]
+
+Be prepared for oral questions such as:
+
+1. What is a linked list?
+
+
+2. Difference between array and linked list?
+
+
+3. What is a primary key and foreign key?
+
+
+4. Explain many-to-many relationship.
+
+
+5. What is a view in SQL?
+
+
+
+
+---
+
+✅ Total Marks: 35
+
+Data Structures: 15
+
+DBMS: 15
+
+Viva: 5
+
+
+Would you like me to format this into a PDF practical solution file (for printing or submission)?
