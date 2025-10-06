@@ -1,0 +1,349 @@
+Section I: Data Structures
+
+
+---
+
+Q1: Write a C program to sort numbers using Quick sort.
+
+Here is a C program that implements the Quick Sort algorithm:
+
+#include <stdio.h>
+
+// Function to swap two elements
+void swap(int* a, int* b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Partition function to select the pivot and place it in the correct position
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];  // Take the last element as pivot
+    int i = low - 1;  // Pointer for the smaller element
+
+    // Traverse through all elements and rearrange elements based on pivot
+    for (int j = low; j < high; j++) {
+        if (arr[j] < pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    
+    swap(&arr[i + 1], &arr[high]);  // Swap the pivot element to the correct position
+    return i + 1;
+}
+
+// Quick Sort function
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        // Find pivot index
+        int pi = partition(arr, low, high);
+        
+        // Recursively sort the left and right subarrays
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+// Function to display the array
+void displayArray(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int arr[] = {12, 4, 8, 19, 1, 6, 14};
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    printf("Original array: ");
+    displayArray(arr, n);
+
+    quickSort(arr, 0, n - 1);
+
+    printf("Sorted array: ");
+    displayArray(arr, n);
+
+    return 0;
+}
+
+Explanation:
+
+1. swap: A helper function to swap two elements.
+
+
+2. partition: It selects a pivot (here, the last element of the array), and rearranges the array such that elements smaller than the pivot are placed to its left and larger ones to its right.
+
+
+3. quickSort: This function is used to recursively sort the array using the partition function.
+
+
+4. displayArray: A helper function to print the array before and after sorting.
+
+
+
+
+---
+
+Q1 OR: Write a menu-driven program for the following operations on a singly linked list.
+
+We need to implement the following operations:
+
+1. Insert an element at a particular position.
+
+
+2. Delete a particular element.
+
+
+
+Here is the C program for these operations:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a node
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert an element at a particular position
+void insertAtPosition(struct Node** head, int data, int position) {
+    struct Node* newNode = createNode(data);
+    if (position == 1) {
+        newNode->next = *head;
+        *head = newNode;
+        return;
+    }
+
+    struct Node* temp = *head;
+    for (int i = 1; temp != NULL && i < position - 1; i++) {
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Position is greater than the length of the list.\n");
+        free(newNode);
+        return;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
+// Function to delete a particular element
+void deleteElement(struct Node** head, int key) {
+    struct Node* temp = *head;
+    struct Node* prev = NULL;
+
+    if (temp != NULL && temp->data == key) {
+        *head = temp->next;
+        free(temp);
+        return;
+    }
+
+    while (temp != NULL && temp->data != key) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Element not found.\n");
+        return;
+    }
+
+    prev->next = temp->next;
+    free(temp);
+}
+
+// Function to display the linked list
+void displayList(struct Node* head) {
+    struct Node* temp = head;
+    if (temp == NULL) {
+        printf("The list is empty.\n");
+        return;
+    }
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    int choice, data, position;
+
+    do {
+        printf("\nMenu:\n");
+        printf("1. Insert element at a particular position\n");
+        printf("2. Delete a particular element\n");
+        printf("3. Display the linked list\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data to insert: ");
+                scanf("%d", &data);
+                printf("Enter position to insert at: ");
+                scanf("%d", &position);
+                insertAtPosition(&head, data, position);
+                break;
+            case 2:
+                printf("Enter element to delete: ");
+                scanf("%d", &data);
+                deleteElement(&head, data);
+                break;
+            case 3:
+                displayList(head);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice! Try again.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
+
+Explanation:
+
+1. createNode: Creates a new node with given data.
+
+
+2. insertAtPosition: Inserts a new node at a particular position. If position is 1, the node is inserted at the head.
+
+
+3. deleteElement: Deletes a node with the specified data.
+
+
+4. displayList: Displays the entire linked list.
+
+
+
+
+---
+
+Section II: Database Management Systems
+
+
+---
+
+Q2A) Create the database and insert records in PostgreSQL
+
+Here is the SQL script to create the Employee and Department tables and insert records:
+
+-- Create the Employee table
+CREATE TABLE Employee (
+    eno SERIAL PRIMARY KEY,
+    ename VARCHAR(100),
+    designation VARCHAR(50),
+    salary DECIMAL(10, 2) CHECK (salary > 5000)
+);
+
+-- Create the Department table
+CREATE TABLE Department (
+    dno SERIAL PRIMARY KEY,
+    dname VARCHAR(100),
+    location VARCHAR(100)
+);
+
+-- Insert records into Employee table
+INSERT INTO Employee (ename, designation, salary) VALUES
+('Sagar', 'Developer', 6000),
+('Anjali', 'Manager', 8000),
+('Ravi', 'Developer', 7000),
+('Priya', 'Tester', 5500),
+('Amit', 'Manager', 9000);
+
+-- Insert records into Department table
+INSERT INTO Department (dname, location) VALUES
+('HR', 'Nanded'),
+('IT', 'Mumbai'),
+('Finance', 'Pune');
+
+Explanation:
+
+1. Employee Table: It contains the fields eno, ename, designation, and salary. The salary is constrained to be greater than 5000.
+
+
+2. Department Table: It contains the fields dno, dname, and location.
+
+
+
+
+---
+
+Q2B) Execute the following queries in PostgreSQL
+
+1. i. Change the designation of employee “Sagar” to Manager.
+
+
+
+UPDATE Employee 
+SET designation = 'Manager' 
+WHERE ename = 'Sagar';
+
+2. ii. Display the minimum salary of an employee.
+
+
+
+SELECT MIN(salary) 
+FROM Employee;
+
+3. iii. List the details of all departments located in Nanded city.
+
+
+
+SELECT * 
+FROM Department 
+WHERE location = 'Nanded';
+
+4. iv. Display the details of employees whose names start with 'A'.
+
+
+
+SELECT * 
+FROM Employee 
+WHERE ename LIKE 'A%';
+
+5. v. List the department number-wise count of employees.
+
+
+
+SELECT d.dno, COUNT(e.eno) AS employee_count
+FROM Department d
+LEFT JOIN Employee e ON e.dno = d.dno
+GROUP BY d.dno;
+
+
+---
+
+Q2C) Write a query to list the department name-wise total salary.
+
+SELECT d.dname, SUM(e.salary) AS total_salary
+FROM Department d
+JOIN Employee e ON e.dno = d.dno
+GROUP BY d.dname;
+
+
+---
+
+Q2C OR) Create a view to display the department details having maximum employees.
+
+CREATE VIEW MaxEmployeesDepartment AS
+SELECT d.dname, COUNT(e
+
