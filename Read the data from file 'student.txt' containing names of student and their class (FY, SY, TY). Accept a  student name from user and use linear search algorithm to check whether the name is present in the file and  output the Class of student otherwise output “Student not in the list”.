@@ -1,0 +1,281 @@
+
+🧮 SECTION I: Data Structures (15 Marks)
+
+Q1) Linear Search in File
+
+> Problem:
+Read data from a file student.txt containing names of students and their class (FY, SY, TY).
+Accept a student name from the user and use Linear Search to check whether the name exists.
+If found → print class;
+else → print “Student not in the list”.
+
+
+
+
+---
+
+✅ C Program: Linear Search from File
+
+#include <stdio.h>
+#include <string.h>
+
+int main() {
+    FILE *fp;
+    char name[50], sname[50], sclass[10];
+    int found = 0;
+
+    fp = fopen("student.txt", "r");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return 1;
+    }
+
+    printf("Enter student name to search: ");
+    scanf("%s", name);
+
+    while (fscanf(fp, "%s %s", sname, sclass) != EOF) {
+        if (strcmp(name, sname) == 0) {
+            printf("Class of %s is %s\n", sname, sclass);
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found)
+        printf("Student not in the list\n");
+
+    fclose(fp);
+    return 0;
+}
+
+📝 Sample student.txt
+
+Riya FY
+Amit SY
+Sam TY
+Priya SY
+
+💻 Output:
+
+Enter student name to search: Amit
+Class of Amit is SY
+
+or
+
+Enter student name to search: Neha
+Student not in the list
+
+
+---
+
+OR
+
+Q1) Reverse String using Stack (Static Implementation)
+
+
+---
+
+✅ C Program: Reverse a String using Stack
+
+#include <stdio.h>
+#include <string.h>
+#define MAX 100
+
+char stack[MAX];
+int top = -1;
+
+void push(char c) {
+    if (top == MAX - 1)
+        printf("Stack Overflow\n");
+    else
+        stack[++top] = c;
+}
+
+char pop() {
+    if (top == -1)
+        return '\0';
+    else
+        return stack[top--];
+}
+
+int main() {
+    char str[MAX];
+    printf("Enter a string: ");
+    gets(str);
+
+    for (int i = 0; i < strlen(str); i++)
+        push(str[i]);
+
+    printf("Reversed string: ");
+    while (top != -1)
+        printf("%c", pop());
+
+    printf("\n");
+    return 0;
+}
+
+💻 Output:
+
+Enter a string: hello
+Reversed string: olleh
+
+
+---
+
+🗄️ SECTION II: Database Management Systems (15 Marks)
+
+
+---
+
+Q2) Consider the database:
+
+Policy(pno, pname, premium_amt, policy_type)
+Customer(cno, cname, city, agent_name)
+Relationship: Policy–Customer → many-to-one
+policy_type = 'Yearly' | 'Half-yearly' | 'Monthly'
+
+
+---
+
+A) Create tables and insert sample records
+
+CREATE TABLE Customer (
+    cno INT PRIMARY KEY,
+    cname VARCHAR(30),
+    city VARCHAR(20),
+    agent_name VARCHAR(30)
+);
+
+CREATE TABLE Policy (
+    pno INT PRIMARY KEY,
+    pname VARCHAR(30),
+    premium_amt DECIMAL(10,2),
+    policy_type VARCHAR(20),
+    cno INT REFERENCES Customer(cno)
+);
+
+✅ Insert Sample Records
+
+INSERT INTO Customer VALUES
+(1, 'Riya', 'Pune', 'Ajay'),
+(2, 'Amit', 'Mumbai', 'Sunil'),
+(3, 'Sam', 'Pune', 'Ajay'),
+(4, 'Priya', 'Delhi', 'Kiran');
+
+INSERT INTO Policy VALUES
+(101, 'Jeevan Anand', 12000, 'Yearly', 1),
+(102, 'Health Plus', 6000, 'Monthly', 2),
+(103, 'Future Gain', 8000, 'Half-yearly', 3),
+(104, 'Jeevan Anand', 10000, 'Monthly', 2),
+(105, 'Money Back', 7000, 'Monthly', 4);
+
+
+---
+
+B) Execute Any 3 Queries
+
+(i) List details of all customers who live in a city
+
+SELECT * FROM Customer WHERE city = 'Pune';
+
+(ii) Display the average premium amount
+
+SELECT AVG(premium_amt) AS average_premium FROM Policy;
+
+(iii) Count the number of customers who have taken ‘Jeevan Anand’ policy
+
+SELECT COUNT(DISTINCT cno) AS total_customers
+FROM Policy
+WHERE pname = 'Jeevan Anand';
+
+(iv) Increase premium amount for ‘Monthly’ policies by 10%
+
+UPDATE Policy
+SET premium_amt = premium_amt * 1.10
+WHERE policy_type = 'Monthly';
+
+(v) Display policy_type-wise count of policies
+
+SELECT policy_type, COUNT(*) AS total_policies
+FROM Policy
+GROUP BY policy_type;
+
+
+---
+
+C) Query: policy_type with highest average premium
+
+SELECT policy_type, AVG(premium_amt) AS avg_premium
+FROM Policy
+GROUP BY policy_type
+ORDER BY avg_premium DESC
+LIMIT 1;
+
+
+---
+
+OR
+
+C) View: customer with highest number of policies
+
+CREATE VIEW TopCustomer AS
+SELECT cname, COUNT(pno) AS total_policies
+FROM Customer
+JOIN Policy ON Customer.cno = Policy.cno
+GROUP BY cname
+ORDER BY total_policies DESC
+LIMIT 1;
+
+View content:
+
+SELECT * FROM TopCustomer;
+
+
+---
+
+🎤 Q3) Viva (5 Marks)
+
+Sample Viva Questions:
+
+1. What is linear search and its complexity?
+
+
+2. What is a stack? Explain LIFO.
+
+
+3. What is the difference between static and dynamic stack?
+
+
+4. What is the use of a primary key?
+
+
+5. What is a foreign key?
+
+
+6. Difference between GROUP BY and ORDER BY.
+
+
+7. Explain VIEW in SQL.
+
+
+8. What is the difference between UPDATE and ALTER commands?
+
+
+
+
+---
+
+✅ Full Coverage Summary:
+
+Section	Question	Answer Type	Language
+
+I	Linear Search from file	C Program	✅
+I (OR)	Reverse String using Stack	C Program	✅
+II	Table Creation & Queries	SQL	✅
+III	Viva	Sample Q&A	✅
+
+
+
+---
+
+Would you like me to combine all this into a ready-to-print PDF practical answer sheet (with proper formatting, title, and section labels)?
