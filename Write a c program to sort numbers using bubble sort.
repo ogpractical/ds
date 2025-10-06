@@ -1,0 +1,326 @@
+
+
+Section I: Data Structures
+
+
+---
+
+Q1: Write a C program to sort numbers using Bubble Sort.
+
+#include <stdio.h>
+
+// Function to perform bubble sort
+void bubbleSort(int arr[], int n) {
+    for (int i = 0; i < n - 1; i++) {
+        // Last i elements are already sorted, so we can ignore them
+        for (int j = 0; j < n - 1 - i; j++) {
+            // If the current element is greater than the next, swap them
+            if (arr[j] > arr[j + 1]) {
+                // Swap arr[j] and arr[j + 1]
+                int temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+// Function to display the array
+void displayArray(int arr[], int n) {
+    for (int i = 0; i < n; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int arr[] = {64, 25, 12, 22, 11};
+    int n = sizeof(arr) / sizeof(arr[0]);
+
+    printf("Original array: ");
+    displayArray(arr, n);
+
+    bubbleSort(arr, n);
+
+    printf("Sorted array: ");
+    displayArray(arr, n);
+
+    return 0;
+}
+
+Explanation:
+
+Bubble Sort compares adjacent elements and swaps them if they are in the wrong order. This process repeats until the list is sorted.
+
+displayArray function prints the array before and after sorting.
+
+
+
+---
+
+Q1 OR: Write a menu-driven program for the following operations on a singly linked list.
+
+Operations:
+
+1. Insert an element at a particular position.
+
+
+2. Search for an element in the linked list.
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Define the structure for a node
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to insert an element at a particular position
+void insertAtPosition(struct Node** head, int data, int position) {
+    struct Node* newNode = createNode(data);
+    if (position == 1) {
+        newNode->next = *head;
+        *head = newNode;
+        return;
+    }
+
+    struct Node* temp = *head;
+    for (int i = 1; temp != NULL && i < position - 1; i++) {
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Position is greater than the length of the list.\n");
+        free(newNode);
+        return;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+}
+
+// Function to search an element in the linked list
+int searchElement(struct Node* head, int key) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        if (temp->data == key) {
+            return 1;  // Element found
+        }
+        temp = temp->next;
+    }
+    return 0;  // Element not found
+}
+
+// Function to display the linked list
+void displayList(struct Node* head) {
+    struct Node* temp = head;
+    if (temp == NULL) {
+        printf("The list is empty.\n");
+        return;
+    }
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int main() {
+    struct Node* head = NULL;
+    int choice, data, position;
+
+    do {
+        printf("\nMenu:\n");
+        printf("1. Insert element at a particular position\n");
+        printf("2. Search for an element\n");
+        printf("3. Display the linked list\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter data to insert: ");
+                scanf("%d", &data);
+                printf("Enter position to insert at: ");
+                scanf("%d", &position);
+                insertAtPosition(&head, data, position);
+                break;
+            case 2:
+                printf("Enter element to search: ");
+                scanf("%d", &data);
+                if (searchElement(head, data)) {
+                    printf("Element %d found in the list.\n", data);
+                } else {
+                    printf("Element %d not found in the list.\n", data);
+                }
+                break;
+            case 3:
+                displayList(head);
+                break;
+            case 4:
+                printf("Exiting...\n");
+                break;
+            default:
+                printf("Invalid choice! Try again.\n");
+        }
+    } while (choice != 4);
+
+    return 0;
+}
+
+Explanation:
+
+The program uses a menu-driven approach to perform linked list operations:
+
+Insert an element at a specific position.
+
+Search for an element in the list.
+
+Display the list.
+
+
+
+
+---
+
+Section II: Database Management Systems
+
+
+---
+
+Q2A) Create the database and insert records in PostgreSQL
+
+-- Create the Bus table
+CREATE TABLE Bus (
+    bno SERIAL PRIMARY KEY,
+    capacity INT,
+    depot_name VARCHAR(100)
+);
+
+-- Create the Driver table
+CREATE TABLE Driver (
+    dno SERIAL PRIMARY KEY,
+    driver_name VARCHAR(100),
+    license_no VARCHAR(50),
+    address VARCHAR(200),
+    age INT,
+    salary DECIMAL(10, 2)
+);
+
+-- Create the Bus_Driver table to establish a many-to-many relationship
+CREATE TABLE Bus_Driver (
+    bno INT,
+    dno INT,
+    date_of_duty DATE,
+    PRIMARY KEY (bno, dno, date_of_duty),
+    FOREIGN KEY (bno) REFERENCES Bus(bno),
+    FOREIGN KEY (dno) REFERENCES Driver(dno)
+);
+
+-- Insert records into the Bus table
+INSERT INTO Bus (capacity, depot_name) VALUES
+(30, 'Kothrud'),
+(40, 'Dadar'),
+(25, 'Pune');
+
+-- Insert records into the Driver table
+INSERT INTO Driver (driver_name, license_no, address, age, salary) VALUES
+('Sagar', 'LIC12345', 'Mumbai', 30, 25000),
+('Swapnil', 'LIC67890', 'Pune', 24, 30000),
+('Rajesh', 'LIC11223', 'Kothrud', 28, 22000);
+
+-- Insert records into the Bus_Driver table
+INSERT INTO Bus_Driver (bno, dno, date_of_duty) VALUES
+(1, 1, '2017-01-15'),
+(1, 2, '2017-01-15'),
+(2, 3, '2017-02-10'),
+(3, 1, '2017-03-05');
+
+Explanation:
+
+Bus Table: Stores the bus number (bno), capacity, and depot name.
+
+Driver Table: Stores details of the drivers (dno, name, license, etc.).
+
+Bus_Driver Table: Represents the many-to-many relationship between buses and drivers with date_of_duty.
+
+
+
+---
+
+Q2B) Execute the following queries in PostgreSQL
+
+1. i. Find the number of buses having capacity more than 20.
+
+
+
+SELECT COUNT(*) 
+FROM Bus 
+WHERE capacity > 20;
+
+2. ii. Count the number of drivers who did duty on "15/01/2017".
+
+
+
+SELECT COUNT(DISTINCT dno) 
+FROM Bus_Driver 
+WHERE date_of_duty = '2017-01-15';
+
+3. iii. Display the license number of all drivers whose name starts with 'S'.
+
+
+
+SELECT license_no 
+FROM Driver 
+WHERE driver_name LIKE 'S%';
+
+4. iv. Calculate the average salary of a driver.
+
+
+
+SELECT AVG(salary) 
+FROM Driver;
+
+5. v. Find all details of the driver named “Swapnil”.
+
+
+
+SELECT * 
+FROM Driver 
+WHERE driver_name = 'Swapnil';
+
+
+---
+
+Q2C) Write a query to find the names of all drivers who were driving buses from “Kothrud Depot” on "12/2/2009".
+
+SELECT d.driver_name 
+FROM Driver d
+JOIN Bus_Driver bd ON d.dno = bd.dno
+JOIN Bus b ON bd.bno = b.bno
+WHERE b.depot_name = 'Kothrud' AND bd.date_of_duty = '2009-02-12';
+
+Explanation:
+
+This query joins the Driver, Bus_Driver, and Bus tables to find the names of the drivers who drove buses from the "Kothrud Depot" on "12/2/2009".
+
+
+
+---
+
+Q2C OR) Create a view to find all details of buses which are driven by drivers whose age is less than 25 years.
+
+CREATE VIEW Bus_Details_Young
+
