@@ -1,0 +1,288 @@
+Section I: Data Structures
+
+Q1: Accept the array of n integers from user and sort the array in ascending order using the recursive Counting Sort algorithm.
+
+Counting Sort is a non-comparative sorting algorithm that works by counting the number of occurrences of each unique element in the array. It then uses this count to place the elements in the correct position.
+
+Here's the recursive Counting Sort in C:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Recursive Counting Sort function
+void countingSortRecursive(int arr[], int n, int exp) {
+    int output[n];
+    int count[10] = {0};
+    
+    // Counting occurrences
+    for (int i = 0; i < n; i++) {
+        count[(arr[i] / exp) % 10]++;
+    }
+    
+    // Cumulative sum of counts
+    for (int i = 1; i < 10; i++) {
+        count[i] += count[i - 1];
+    }
+
+    // Build the output array
+    for (int i = n - 1; i >= 0; i--) {
+        output[count[(arr[i] / exp) % 10] - 1] = arr[i];
+        count[(arr[i] / exp) % 10]--;
+    }
+
+    // Copy the output array back to the original array
+    for (int i = 0; i < n; i++) {
+        arr[i] = output[i];
+    }
+}
+
+// Helper function to sort the array
+void recursiveCountingSort(int arr[], int n, int exp) {
+    if (exp > 0) {
+        countingSortRecursive(arr, n, exp);
+        recursiveCountingSort(arr, n, exp / 10);
+    }
+}
+
+// Function to find the maximum element in the array
+int getMax(int arr[], int n) {
+    int max = arr[0];
+    for (int i = 1; i < n; i++) {
+        if (arr[i] > max) {
+            max = arr[i];
+        }
+    }
+    return max;
+}
+
+int main() {
+    int n;
+
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter %d integers: ", n);
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    // Find the maximum number to determine the range of digits
+    int max = getMax(arr, n);
+    int exp = 1;
+
+    // Sorting the array recursively using Counting Sort
+    while (max / exp > 0) {
+        recursiveCountingSort(arr, n, exp);
+        exp *= 10;
+    }
+
+    printf("Sorted array: ");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    return 0;
+}
+
+Explanation of the code:
+
+1. countingSortRecursive function: This function implements the core logic of the Counting Sort. It counts the occurrences of each digit (from 0 to 9) at a specific position (given by exp), then builds the sorted output and copies it back to the original array.
+
+
+2. recursiveCountingSort function: This function is the recursive part. It calls the countingSortRecursive function for different digit places (units, tens, hundreds, etc.) until all the digits have been processed.
+
+
+3. getMax function: Finds the maximum number in the array, which is required to determine the number of digits (places) that need to be sorted.
+
+
+4. Main function: Accepts the array of n integers, finds the maximum number, and sorts the array using the recursive counting sort algorithm.
+
+
+
+
+---
+
+Q1 OR: Write a C program to search an element from a sequence of elements using Binary Search.
+
+Here is the C code for performing Binary Search on a sorted array:
+
+#include <stdio.h>
+
+// Function to perform Binary Search
+int binarySearch(int arr[], int low, int high, int key) {
+    if (low <= high) {
+        int mid = low + (high - low) / 2;
+        
+        // Check if key is at mid
+        if (arr[mid] == key) {
+            return mid;
+        }
+        
+        // If key is smaller than mid, it can only be in the left subarray
+        if (arr[mid] > key) {
+            return binarySearch(arr, low, mid - 1, key);
+        }
+        
+        // Else the key can only be in the right subarray
+        return binarySearch(arr, mid + 1, high, key);
+    }
+    
+    return -1;  // Key not found
+}
+
+int main() {
+    int n, key;
+
+    printf("Enter the number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter the elements (sorted order): ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    printf("Enter the element to search: ");
+    scanf("%d", &key);
+
+    int result = binarySearch(arr, 0, n - 1, key);
+    
+    if (result != -1) {
+        printf("Element %d found at index %d\n", key, result);
+    } else {
+        printf("Element %d not found\n", key);
+    }
+
+    return 0;
+}
+
+Explanation:
+
+1. binarySearch function: This function recursively divides the search space by half, checking the middle element in each iteration. If the key matches the middle element, the index is returned. If the key is smaller, the search continues in the left subarray, and if the key is larger, it continues in the right subarray.
+
+
+2. Main function: Accepts an array of n integers (assumed to be sorted) and a key to search for. The result of the binary search is printed, either showing the index of the key or indicating that the key was not found.
+
+
+
+
+---
+
+Section II: Database Management Systems
+
+Q2A) Create the database and insert records in PostgreSQL
+
+The SQL code for creating the Bus and Route tables and inserting sample records is as follows:
+
+-- Create Bus table
+CREATE TABLE Bus (
+    Busno SERIAL PRIMARY KEY,
+    capacity INT NOT NULL,
+    depot_name VARCHAR(100)
+);
+
+-- Create Route table
+CREATE TABLE Route (
+    Routeno SERIAL PRIMARY KEY,
+    source VARCHAR(100),
+    destination VARCHAR(100),
+    no_of_stations INT,
+    busno INT,
+    FOREIGN KEY (busno) REFERENCES Bus(Busno)
+);
+
+-- Insert records into Bus table
+INSERT INTO Bus (capacity, depot_name) VALUES
+(50, 'Sangamner'),
+(30, 'Pune'),
+(40, 'Mumbai'),
+(20, 'Aurangabad'),
+(60, 'Nagpur');
+
+-- Insert records into Route table
+INSERT INTO Route (source, destination, no_of_stations, busno) VALUES
+('Sangamner', 'Mumbai', 10, 1),
+('Pune', 'Nagpur', 15, 2),
+('Mumbai', 'Aurangabad', 12, 3),
+('Nagpur', 'Pune', 9, 4),
+('Aurangabad', 'Mumbai', 20, 5);
+
+
+---
+
+Q2B) Execute the following queries in PostgreSQL
+
+1. i. Count total buses at depot “Sangamner”.
+
+
+
+SELECT COUNT(*) 
+FROM Bus 
+WHERE depot_name = 'Sangamner';
+
+2. ii. Delete all buses having capacity less than 20.
+
+
+
+DELETE FROM Bus 
+WHERE capacity < 20;
+
+3. iii. List all buses on route number 41.
+
+
+
+SELECT B.Busno, B.capacity, B.depot_name
+FROM Bus B
+JOIN Route R ON B.Busno = R.busno
+WHERE R.Routeno = 41;
+
+4. iv. Find the maximum number of stations.
+
+
+
+SELECT MAX(no_of_stations) 
+FROM Route;
+
+5. v. List all routes from “Pimpri” to “Vimannagar”.
+
+
+
+SELECT * 
+FROM Route 
+WHERE source = 'Pimpri' AND destination = 'Vimannagar';
+
+
+---
+
+Q2C) Write a query to delete all the buses of destination “Baramati”.
+
+DELETE FROM Bus 
+WHERE Busno IN (
+    SELECT busno 
+    FROM Route 
+    WHERE destination = 'Baramati'
+);
+
+
+---
+
+Q2C OR) Create a view to find the route having the maximum number of stations and the buses which run on that route.
+
+CREATE VIEW MaxStationsRoute AS
+SELECT R.Routeno, R.source, R.destination, R.no_of_stations, B.Busno, B.capacity
+FROM Route R
+JOIN Bus B ON R.busno = B.Busno
+WHERE R.no_of_stations = (SELECT MAX(no_of_stations) FROM Route);
+
+
+---
+
+Conclusion
+
+Section I: The recursive Counting Sort algorithm sorts the input array in ascending order, and the Binary Search program searches for a key in a sorted array.
+
+Section II: SQL queries for creating
+
+
