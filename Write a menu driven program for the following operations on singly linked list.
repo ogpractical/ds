@@ -1,0 +1,248 @@
+
+
+✅ Section I: Data Structures (15 Marks)
+
+✅ OPTION 1 – Singly Linked List
+
+Menu-driven C Program
+Operations:
+
+1. Create and display a linked list of n nodes
+
+
+2. Delete a particular element
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* head = NULL;
+
+void createList(int n) {
+    struct Node *temp, *newNode;
+    int value;
+    for (int i = 0; i < n; i++) {
+        newNode = (struct Node*)malloc(sizeof(struct Node));
+        printf("Enter data for node %d: ", i + 1);
+        scanf("%d", &value);
+        newNode->data = value;
+        newNode->next = NULL;
+
+        if (head == NULL)
+            head = newNode;
+        else {
+            temp = head;
+            while (temp->next != NULL)
+                temp = temp->next;
+            temp->next = newNode;
+        }
+    }
+}
+
+void displayList() {
+    struct Node *temp = head;
+    if (temp == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+    printf("Linked List: ");
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+void deleteElement(int key) {
+    struct Node *temp = head, *prev = NULL;
+    if (temp != NULL && temp->data == key) {
+        head = temp->next;
+        free(temp);
+        printf("Element %d deleted.\n", key);
+        return;
+    }
+    while (temp != NULL && temp->data != key) {
+        prev = temp;
+        temp = temp->next;
+    }
+    if (temp == NULL) {
+        printf("Element not found.\n");
+        return;
+    }
+    prev->next = temp->next;
+    free(temp);
+    printf("Element %d deleted.\n", key);
+}
+
+int main() {
+    int choice, n, key;
+    while (1) {
+        printf("\n--- MENU ---\n");
+        printf("1. Create & Display List\n2. Delete Element\n3. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+            printf("Enter number of nodes: ");
+            scanf("%d", &n);
+            createList(n);
+            displayList();
+            break;
+        case 2:
+            printf("Enter element to delete: ");
+            scanf("%d", &key);
+            deleteElement(key);
+            displayList();
+            break;
+        case 3:
+            exit(0);
+        default:
+            printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
+
+
+---
+
+✅ OPTION 2 – Linear Search (Array)
+
+#include <stdio.h>
+
+void acceptArray(int arr[], int n) {
+    printf("Enter %d elements:\n", n);
+    for (int i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+}
+
+void displayArray(int arr[], int n) {
+    printf("Array: ");
+    for (int i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+    printf("\n");
+}
+
+int linearSearch(int arr[], int n, int x) {
+    for (int i = 0; i < n; i++) {
+        if (arr[i] == x)
+            return i;
+    }
+    return -1;
+}
+
+int main() {
+    int n, x, arr[100];
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    acceptArray(arr, n);
+    displayArray(arr, n);
+
+    printf("Enter element to search: ");
+    scanf("%d", &x);
+
+    int pos = linearSearch(arr, n, x);
+    if (pos != -1)
+        printf("Element %d found at position %d.\n", x, pos + 1);
+    else
+        printf("Element not found.\n");
+
+    return 0;
+}
+
+
+---
+
+✅ Section II: Database Management Systems (15 Marks)
+
+✅ A) Create Tables & Insert Records
+
+CREATE TABLE Area (
+    aname VARCHAR(50) PRIMARY KEY,
+    area_type VARCHAR(10) CHECK (area_type IN ('urban', 'rural'))
+);
+
+CREATE TABLE Person (
+    pnumber INT PRIMARY KEY,
+    pname VARCHAR(50),
+    birthdate DATE,
+    income INT,
+    aname VARCHAR(50) REFERENCES Area(aname)
+);
+
+INSERT INTO Area VALUES 
+('Pune', 'urban'),
+('Delhi', 'urban'),
+('Nashik', 'rural');
+
+INSERT INTO Person VALUES
+(1, 'Amit', '1995-02-10', 15000, 'Pune'),
+(2, 'Riya', '1998-05-15', 9000, 'Nashik'),
+(3, 'Suresh', '1990-02-25', 20000, 'Pune'),
+(4, 'Neha', '1992-07-05', 12000, 'Delhi');
+
+
+---
+
+✅ B) Execute Any 3 Queries
+
+i) Persons with income > 10000
+
+SELECT * FROM Person WHERE income > 10000;
+
+ii) Transfer all people living in Pune to Delhi
+
+UPDATE Person SET aname = 'Delhi' WHERE aname = 'Pune';
+
+iii) Count number of urban areas
+
+SELECT COUNT(*) AS urban_areas FROM Area WHERE area_type = 'urban';
+
+iv) Count of people born in February
+
+SELECT COUNT(*) AS feb_count 
+FROM Person 
+WHERE EXTRACT(MONTH FROM birthdate) = 2;
+
+v) Names of people in rural area
+
+SELECT pname FROM Person WHERE aname IN 
+(SELECT aname FROM Area WHERE area_type = 'rural');
+
+
+---
+
+✅ C) Query (Option 1)
+
+Count total people in Urban area with income equal to average income
+
+SELECT COUNT(*) AS total_people
+FROM Person p
+JOIN Area a ON p.aname = a.aname
+WHERE a.area_type = 'urban'
+AND p.income = (SELECT AVG(income) FROM Person);
+
+✅ OR (Option 2)
+
+Create a View
+
+CREATE VIEW PersonAreaView AS
+SELECT p.pnumber, p.pname, p.birthdate, p.income, a.aname
+FROM Person p
+JOIN Area a ON p.aname = a.aname;
+
+SELECT * FROM PersonAreaView;
+
+
+---
+
+If you need the answers in PDF, handwritten format, or separated sections, just tell me!
+
