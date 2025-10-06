@@ -1,0 +1,292 @@
+
+🧮 Section I: Data Structures (15 Marks)
+
+Q1. Sort a random array using Selection Sort
+
+#include <stdio.h>
+
+void selectionSort(int arr[], int n) {
+    int i, j, minIndex, temp;
+    for (i = 0; i < n - 1; i++) {
+        minIndex = i;
+        for (j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIndex])
+                minIndex = j;
+        }
+        // Swap elements
+        temp = arr[i];
+        arr[i] = arr[minIndex];
+        arr[minIndex] = temp;
+    }
+}
+
+int main() {
+    int n, i;
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+    printf("Enter %d integers:\n", n);
+    for (i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
+
+    selectionSort(arr, n);
+
+    printf("Array in ascending order:\n");
+    for (i = 0; i < n; i++)
+        printf("%d ", arr[i]);
+
+    return 0;
+}
+
+
+---
+
+OR: Menu-driven program for Linked List
+
+Operations:
+
+1. Create and display a linked list
+
+
+2. Search for an element in the linked list
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+struct Node *head = NULL;
+
+void createList(int n) {
+    struct Node *newNode, *temp;
+    int data, i;
+
+    head = (struct Node *)malloc(sizeof(struct Node));
+    printf("Enter data for node 1: ");
+    scanf("%d", &data);
+    head->data = data;
+    head->next = NULL;
+    temp = head;
+
+    for (i = 2; i <= n; i++) {
+        newNode = (struct Node *)malloc(sizeof(struct Node));
+        printf("Enter data for node %d: ", i);
+        scanf("%d", &data);
+        newNode->data = data;
+        newNode->next = NULL;
+        temp->next = newNode;
+        temp = newNode;
+    }
+}
+
+void displayList() {
+    struct Node *temp = head;
+    if (head == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+    printf("Linked List: ");
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+void searchElement(int key) {
+    struct Node *temp = head;
+    int found = 0, pos = 1;
+    while (temp != NULL) {
+        if (temp->data == key) {
+            printf("Element %d found at position %d.\n", key, pos);
+            found = 1;
+            break;
+        }
+        temp = temp->next;
+        pos++;
+    }
+    if (!found)
+        printf("Element not found.\n");
+}
+
+int main() {
+    int n, choice, key;
+    printf("Enter number of nodes: ");
+    scanf("%d", &n);
+    createList(n);
+
+    while (1) {
+        printf("\n1. Display List\n2. Search Element\n3. Exit\nEnter choice: ");
+        scanf("%d", &choice);
+        switch (choice) {
+            case 1:
+                displayList();
+                break;
+            case 2:
+                printf("Enter element to search: ");
+                scanf("%d", &key);
+                searchElement(key);
+                break;
+            case 3:
+                exit(0);
+            default:
+                printf("Invalid choice!\n");
+        }
+    }
+    return 0;
+}
+
+
+---
+
+🗄️ Section II: Database Management Systems (15 Marks)
+
+Given:
+
+Student (rno, name, city)
+Teacher (tno, tname, phone_no, salary)
+Relationship: Student–Teacher → many-to-many with subject as descriptive attribute
+
+
+---
+
+A. Create database and insert records (PostgreSQL)
+
+CREATE TABLE Student (
+    rno INT PRIMARY KEY,
+    name VARCHAR(50),
+    city VARCHAR(50)
+);
+
+CREATE TABLE Teacher (
+    tno INT PRIMARY KEY,
+    tname VARCHAR(50),
+    phone_no VARCHAR(15),
+    salary DECIMAL(10,2)
+);
+
+CREATE TABLE Student_Teacher (
+    rno INT REFERENCES Student(rno),
+    tno INT REFERENCES Teacher(tno),
+    subject VARCHAR(50),
+    PRIMARY KEY (rno, tno)
+);
+
+-- Insert data
+INSERT INTO Student VALUES
+(1, 'Amit', 'Ahmednagar'),
+(2, 'Sneha', 'Pune'),
+(3, 'Rahul', 'Ahilyanagar'),
+(4, 'Priya', 'Ahilyanagar');
+
+INSERT INTO Teacher VALUES
+(101, 'Mr. Patil', '9822001111', 55000),
+(102, 'Mrs. Deshmukh', '9822131226', 48000),
+(103, 'Prof. Kulkarni', '9822345678', 42000);
+
+INSERT INTO Student_Teacher VALUES
+(1, 101, 'DBMS'),
+(2, 102, 'OS'),
+(3, 103, 'DBMS'),
+(4, 101, 'C Programming');
+
+
+---
+
+B. Execute the following queries (any 3)
+
+i. List names of students from ‘Ahilyanagar’.
+
+SELECT name FROM Student WHERE city = 'Ahilyanagar';
+
+ii. Display count of teachers whose salary is between 40000 and 60000.
+
+SELECT COUNT(*) AS Teacher_Count 
+FROM Teacher 
+WHERE salary BETWEEN 40000 AND 60000;
+
+iii. Change phone number of ‘Prof. Patil’ to ‘9822131226’.
+
+UPDATE Teacher 
+SET phone_no = '9822131226' 
+WHERE tname = 'Prof. Patil';
+
+iv. List details of teachers in sorted order of their name.
+
+SELECT * FROM Teacher ORDER BY tname ASC;
+
+v. List names of teachers who have salary less than 50000.
+
+SELECT tname FROM Teacher WHERE salary < 50000;
+
+
+---
+
+C. Query to list names of teachers who do NOT teach any subject taught by 'Mr. Patil'
+
+SELECT t.tname
+FROM Teacher t
+WHERE t.tno NOT IN (
+    SELECT st2.tno
+    FROM Student_Teacher st1
+    JOIN Student_Teacher st2 ON st1.subject = st2.subject
+    JOIN Teacher t1 ON st1.tno = t1.tno
+    WHERE t1.tname = 'Mr. Patil'
+);
+
+
+---
+
+OR – Create a view to list details of students who have taken ‘DBMS’ subject
+
+CREATE VIEW DBMS_Students AS
+SELECT s.rno, s.name, s.city
+FROM Student s
+JOIN Student_Teacher st ON s.rno = st.rno
+WHERE st.subject = 'DBMS';
+
+
+---
+
+🎤 Section III: Viva (5 Marks)
+
+Common Viva Questions:
+
+1. What is the difference between selection sort and bubble sort?
+
+
+2. What is a linked list?
+
+
+3. What is the difference between primary key and foreign key?
+
+
+4. Define a view in SQL.
+
+
+5. What is a many-to-many relationship?
+
+
+
+
+---
+
+✅ Total: 35 Marks
+
+Data Structures: 15
+
+DBMS: 15
+
+Viva: 5
+
+
+
+---
+
+Would you like me to generate this as a PDF “Practical Solution File” for easy print/submission?
