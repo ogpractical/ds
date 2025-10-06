@@ -1,0 +1,250 @@
+
+Section I: Data Structures
+
+Q1: Write a menu-driven program for the following operations on a singly linked list.
+
+In this case, we will create a Singly Linked List and implement two operations:
+
+1. Create and display the linked list.
+
+
+2. Accept an element from the user and concatenate it with the created linked list.
+
+
+
+Here’s the code for this in C:
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Definition of the Node structure
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+// Function to create and display a linked list
+void display(struct Node* head) {
+    struct Node* temp = head;
+    if (temp == NULL) {
+        printf("The list is empty.\n");
+        return;
+    }
+    printf("The list contains: ");
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+// Function to create a new node
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+// Function to add a node at the end of the list
+struct Node* appendNode(struct Node* head, int data) {
+    struct Node* newNode = createNode(data);
+    if (head == NULL) {
+        return newNode;  // The list is empty, return the new node as the head
+    } else {
+        struct Node* temp = head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newNode;  // Append the new node at the end
+    }
+    return head;
+}
+
+// Function to concatenate the list with a new node at the end
+struct Node* concatenate(struct Node* head, int data) {
+    return appendNode(head, data);  // Simply append the node to the existing list
+}
+
+int main() {
+    struct Node* head = NULL;
+    int choice, value;
+    
+    do {
+        printf("\nMenu:\n");
+        printf("1. Create and display the linked list\n");
+        printf("2. Accept an element from the user and concatenate it with the list\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        
+        switch (choice) {
+            case 1:
+                // Create a linked list with some initial values
+                head = appendNode(head, 10);
+                head = appendNode(head, 20);
+                head = appendNode(head, 30);
+                display(head);
+                break;
+            case 2:
+                printf("Enter the element to append: ");
+                scanf("%d", &value);
+                head = concatenate(head, value);
+                printf("Updated list: ");
+                display(head);
+                break;
+            case 3:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice! Please try again.\n");
+        }
+    } while (choice != 3);
+    
+    return 0;
+}
+
+Explanation of the code:
+
+1. Singly Linked List Node: We define a Node structure that contains an integer data and a pointer to the next node (next).
+
+
+2. display function: Displays the current elements of the list. If the list is empty, it displays a message.
+
+
+3. createNode function: This function allocates memory for a new node, sets its data, and returns the node.
+
+
+4. appendNode function: Adds a new node at the end of the list.
+
+
+5. concatenate function: Simply appends a new node at the end of the list, as a form of concatenation.
+
+
+6. Menu-driven program: The main function gives the user options to either create and display the linked list or accept a new element and concatenate it with the list.
+
+
+
+
+---
+
+Section II: Database Management Systems
+
+Q2A) Create the database and insert records in PostgreSQL
+
+Here's the SQL code to create the necessary tables (Doctor and Patient) in PostgreSQL, and insert some sample data:
+
+-- Create Doctor table
+CREATE TABLE Doctor (
+    dcode SERIAL PRIMARY KEY,
+    doctor_name VARCHAR(100),
+    specialization VARCHAR(50),
+    address VARCHAR(100),
+    phone_no VARCHAR(20),
+    fees DECIMAL(10, 2)
+);
+
+-- Create Patient table
+CREATE TABLE Patient (
+    pcode SERIAL PRIMARY KEY,
+    patient_name VARCHAR(100),
+    symptoms VARCHAR(100),
+    dcode INT,
+    FOREIGN KEY (dcode) REFERENCES Doctor(dcode)
+);
+
+-- Insert sample records into Doctor table
+INSERT INTO Doctor (doctor_name, specialization, address, phone_no, fees)
+VALUES
+('Dr. Rajesh Patil', 'Neurologist', 'Sadashiv Peth', '9876543210', 500.00),
+('Dr. Sita Joshi', 'Orthopedic', 'Shivajinagar', '9988776655', 400.00),
+('Dr. Anil Sharma', 'Cardiologist', 'Camp', '9871234567', 700.00),
+('Dr. Rekha Kaur', 'Neurologist', 'Sadashiv Peth', '9112233445', 600.00);
+
+-- Insert sample records into Patient table
+INSERT INTO Patient (patient_name, symptoms, dcode)
+VALUES
+('Mohan', 'Fever', 1),
+('Ravi', 'Cold', 2),
+('Neelam', 'Back Pain', 2),
+('Maya', 'Headache', 1),
+('Kiran', 'Chest Pain', 3);
+
+
+---
+
+Q2B) Execute the following queries in PostgreSQL
+
+1. i. Find the names of all Patients which start with "M":
+
+
+
+SELECT patient_name 
+FROM Patient 
+WHERE patient_name LIKE 'M%';
+
+2. ii. Count the number of doctors who are Neurologists:
+
+
+
+SELECT COUNT(*) 
+FROM Doctor 
+WHERE specialization = 'Neurologist';
+
+3. iii. List all patients suffering from "Fever":
+
+
+
+SELECT patient_name 
+FROM Patient 
+WHERE symptoms = 'Fever';
+
+4. iv. Find the specialization and phone numbers of all doctors from ‘Sadashiv Peth’:
+
+
+
+SELECT doctor_name, specialization, phone_no 
+FROM Doctor 
+WHERE address = 'Sadashiv Peth';
+
+5. v. Change the address of Dr. Patil to "Camp":
+
+
+
+UPDATE Doctor 
+SET address = 'Camp' 
+WHERE doctor_name = 'Dr. Rajesh Patil';
+
+
+---
+
+Q2C) Query to display the list of patients who are treated by doctors staying in ‘Shivajinagar’ area with the specialization “Orthopedic”:
+
+SELECT p.patient_name 
+FROM Patient p
+JOIN Doctor d ON p.dcode = d.dcode
+WHERE d.address = 'Shivajinagar' AND d.specialization = 'Orthopedic';
+
+
+---
+
+Q2C OR) Create a view to find the names of patients who are treated by doctors with minimum fees:
+
+CREATE VIEW Min_Fee_Patients AS
+SELECT p.patient_name
+FROM Patient p
+JOIN Doctor d ON p.dcode = d.dcode
+WHERE d.fees = (SELECT MIN(fees) FROM Doctor);
+
+
+---
+
+Conclusion
+
+For Section I, the menu-driven C program implements a Singly Linked List with two basic operations: creating a list and displaying it, and concatenating new elements to it.
+
+For Section II, the SQL queries for creating the Doctor and Patient tables and executing the required queries are provided. Additionally, a query to find patients treated by doctors with minimum fees using a view is also included.
+
+
+Let me know if you need any further explanations or modifications!
+
