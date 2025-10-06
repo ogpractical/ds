@@ -1,0 +1,247 @@
+Section I — Data Structures
+
+Q1 (a) C program — create n random elements and sort ascending using insertion sort
+
+/* insertion_sort_random.c
+   Compile: gcc insertion_sort_random.c -o insertion_sort_random
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+void insertionSort(int a[], int n) {
+    for (int i = 1; i < n; i++) {
+        int key = a[i];
+        int j = i - 1;
+        while (j >= 0 && a[j] > key) {
+            a[j+1] = a[j];
+            j--;
+        }
+        a[j+1] = key;
+    }
+}
+
+int main() {
+    int n;
+    printf("Enter number of elements (n): ");
+    if (scanf("%d", &n) != 1 || n <= 0) {
+        printf("Invalid n\n");
+        return 1;
+    }
+
+    int *arr = malloc(n * sizeof(int));
+    if (!arr) {
+        perror("malloc");
+        return 1;
+    }
+
+    srand((unsigned)time(NULL));
+    printf("Random array:\n");
+    for (int i = 0; i < n; i++) {
+        arr[i] = rand() % 10001; // values 0..10000
+        printf("%d ", arr[i]);
+    }
+    printf("\n");
+
+    insertionSort(arr, n);
+
+    printf("Sorted array (ascending):\n");
+    for (int i = 0; i < n; i++) printf("%d ", arr[i]);
+    printf("\n");
+
+    free(arr);
+    return 0;
+}
+
+
+---
+
+Q1 (b) C program — static implementation of stack (push n integers, then pop & display; uses isEmpty())
+
+/* static_stack.c
+   Compile: gcc static_stack.c -o static_stack
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#define MAX 100
+
+int stackArr[MAX];
+int top = -1;
+
+int isEmpty() {
+    return top == -1;
+}
+
+int isFull() {
+    return top == MAX - 1;
+}
+
+void push(int x) {
+    if (isFull()) {
+        printf("Stack overflow! cannot push %d\n", x);
+        return;
+    }
+    stackArr[++top] = x;
+}
+
+int pop() {
+    if (isEmpty()) {
+        printf("Stack underflow! returning -1\n");
+        return -1; // sentinel
+    }
+    return stackArr[top--];
+}
+
+int main() {
+    int n, val;
+    printf("How many integers to push? ");
+    if (scanf("%d", &n) != 1 || n < 0) return 1;
+    if (n > MAX) {
+        printf("n too large (max %d). Truncating to %d\n", MAX, MAX);
+        n = MAX;
+    }
+
+    printf("Enter %d integers to push:\n", n);
+    for (int i = 0; i < n; i++) {
+        if (scanf("%d", &val) != 1) { printf("Invalid input\n"); return 1; }
+        push(val);
+    }
+
+    printf("Popping and displaying elements:\n");
+    while (!isEmpty()) {
+        printf("%d ", pop());
+    }
+    printf("\n");
+    return 0;
+}
+
+
+---
+
+Section II — Database Management Systems (PostgreSQL)
+
+We will create Room and Guest tables and show sample INSERTs and the requested queries. Because Room–Guest is one-to-one, I put guestcode as a UNIQUE foreign key in Room (each room assigned to at most one guest and each guest can be assigned at most one room). You can also model the 1:1 by putting roomno in Guest; either is fine.
+
+A. CREATE TABLE and INSERT sample records
+
+-- Use psql or any postgres client
+-- 1) Create tables
+CREATE TABLE Guest (
+  guestcode SERIAL PRIMARY KEY,
+  gname VARCHAR(100) NOT NULL,
+  city VARCHAR(100)
+);
+
+CREATE TABLE Room (
+  roomno SERIAL PRIMARY KEY,
+  room_name VARCHAR(100),
+  room_type VARCHAR(10) CHECK (room_type IN ('AC','NonAC')),
+  charges NUMERIC(10,2) NOT NULL,
+  guestcode INTEGER UNIQUE,         -- one-to-one: one room -> at most one guest
+  FOREIGN KEY (guestcode) REFERENCES Guest(guestcode)
+);
+
+-- 2) Insert sample Guests
+INSERT INTO Guest (gname, city) VALUES
+('Rohit Sharma','Mumbai'),
+('Anita Desai','Pune'),
+('Suresh Patil','Nagpur'),
+('Meera Joshi','Pune'),
+('John Doe','Delhi');
+
+-- 3) Insert sample Rooms (some AC, some NonAC)
+INSERT INTO Room (room_name, room_type, charges, guestcode) VALUES
+('Deluxe Suite','AC', 12000.00, 1),
+('Standard Room','NonAC', 7000.00, 2),
+('Executive','AC', 15000.00, 3),
+('Economy','NonAC', 4500.00, NULL),
+('Business','AC', 9000.00, 4),
+('Family','NonAC', 11000.00, 5);
+
+> Note: I used SERIAL for convenience; if using newer PG versions you may prefer GENERATED AS IDENTITY. guestcode is UNIQUE in Room to enforce 1:1 from Room to Guest.
+
+
+
+
+---
+
+B. Execute the following queries in PostgreSQL (any 3) — I'll give all five; you can pick any 3.
+
+i. List details of the rooms having charges between 5000 and 10000.
+
+SELECT * FROM Room
+WHERE charges BETWEEN 5000 AND 10000;
+
+ii. List the names of the guests in the sorted order by city name.
+
+SELECT gname, city
+FROM Guest
+ORDER BY city ASC, gname ASC;
+
+iii. List the minimum charges of a room.
+
+SELECT MIN(charges) AS min_charges FROM Room;
+
+iv. Increase the charges of all AC rooms by 15%.
+
+UPDATE Room
+SET charges = ROUND(charges * 1.15, 2)
+WHERE room_type = 'AC';
+
+-- To see the updated rows:
+SELECT * FROM Room WHERE room_type = 'AC';
+
+v. List the names of all the NONAC rooms whose charges are more than 10000.
+
+SELECT room_name, charges
+FROM Room
+WHERE room_type = 'NonAC' AND charges > 10000;
+
+
+---
+
+C. Query to list the name of the guest to whom the room with highest charges is allotted
+
+We want guest name of the room having maximum charges. If the max room might have no guest assigned, this returns NULL; but typically we join:
+
+SELECT g.gname AS guest_name, r.room_name, r.charges
+FROM Room r
+JOIN Guest g ON r.guestcode = g.guestcode
+WHERE r.charges = (SELECT MAX(charges) FROM Room);
+
+This returns guest name(s) for room(s) with the maximum charge.
+
+
+---
+
+OR — alternative C: Create a view to list names of all the NonAC rooms which have charges greater than at least one of the 'AC' room.
+
+Interpretation: NonAC room whose charge is greater than at least one AC room (i.e., exists an AC room with lower charges). Create a view:
+
+CREATE OR REPLACE VIEW NonAC_higher_than_some_AC AS
+SELECT r.roomno, r.room_name, r.charges
+FROM Room r
+WHERE r.room_type = 'NonAC'
+  AND EXISTS (
+    SELECT 1 FROM Room ac
+    WHERE ac.room_type = 'AC' AND r.charges > ac.charges
+  );
+
+-- To see:
+SELECT * FROM NonAC_higher_than_some_AC;
+
+
+---
+
+Q3 Viva
+
+(Oral — practice answers: be ready to explain insertion sort algorithm step-by-step, time complexity O(n²) worst-case, best-case O(n) when nearly sorted; static stack operations O(1); SQL DDL, DML, use of constraints, primary key/foreign key/unique/check, and how to model 1:1 relationships.)
+
+
+---
+
+If you want:
+
+I can explain any line of the C programs or walk through an example array step-by-step.
+
+I can also produce a SQL script file you can run directly and provide sample outputs (or export CSV) — tell me which.
